@@ -11,7 +11,7 @@ export const agregarUsuario = (req, res) => {
     email: body.email,
     contraseña: body.contraseña,
     rol: body.rol || "usuario",
-    plan: body.plan || "plus",
+    plan: body.plan || "estandar",
     creadoEn: new Date(),
     actualizadoEn: new Date(),
   };

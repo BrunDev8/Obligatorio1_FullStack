@@ -23,18 +23,22 @@ export const crearUsuarioSchema = Joi.object({
     "string.max": "La contraseña no puede tener más de {#limit} caracteres",
     "any.required": "La contraseña es obligatoria",
   }),
-
-  rol: Joi.string().valid("usuario", "admin").required().messages({
+  rol: Joi.string().trim().lowercase().valid("usuario", "admin").required().messages({
     "any.only": "El rol debe ser usuario o admin",
     "any.required": "El rol es obligatorio",
   }),
+
+  plan: Joi.string().trim().lowercase().valid("estandar", "premium").required().messages({
+    "any.only": "El plan debe ser estandar o premium",
+    "any.required": "El plan es obligatorio",
+  }),
 });
 
-export const buscarUsuarioSchema = Joi.string().trim().min(3).required().messages({
+export const buscarUsuarioSchema = Joi.string().trim().lowercase().min(3).required().messages({
   "string.base": "El nombre debe ser un texto",
   "string.empty": "El nombre no puede estar vacío",
   "string.min": "El nombre debe tener al menos {#limit} caracteres",
   "any.required": "El nombre es obligatorio",
 });
 
-export default { crearUsuarioSchema };
+export default { crearUsuarioSchema, buscarUsuarioSchema };
