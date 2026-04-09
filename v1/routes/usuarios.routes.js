@@ -3,7 +3,7 @@ import { agregarUsuario, buscarUsuario } from "../controllers/usuarios.controlle
 import { validateBodyMiddleware } from "../middlewares/validateBody.middleware.js";
 import { crearUsuarioSchema } from "../validators/usuarios.validators.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.get("/:nombre", buscarUsuario);
 router.post("/", validateBodyMiddleware(crearUsuarioSchema), agregarUsuario );

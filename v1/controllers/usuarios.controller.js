@@ -1,7 +1,7 @@
 import { crearUsuarioSchema, buscarUsuarioSchema } from "../validators/usuarios.validators.js";
 
-let usuarios = [];
-let nextId = 1;
+export let usuarios = [];
+export let nextId = 1;
 
 export const agregarUsuario = (req, res) => {
   const body = req.validatedBody || req.body;
