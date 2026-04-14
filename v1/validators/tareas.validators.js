@@ -1,9 +1,9 @@
 import Joi from "joi";
 
 export const crearTareaSchema = Joi.object({
-  ecosistemaId: Joi.number().integer().required().messages({
-    "number.base": "El id del ecosistema debe ser un número",
-    "number.integer": "El id del ecosistema debe ser un entero",
+  ecosistemaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
+    "string.base": "El id del ecosistema debe ser un texto (ObjectId)",
+    "string.pattern.base": "El id del ecosistema debe ser un ObjectId válido",
     "any.required": "El id del ecosistema es obligatorio",
   }),
 

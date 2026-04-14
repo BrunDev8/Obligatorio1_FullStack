@@ -18,16 +18,26 @@ export const crearEcosistemaSchema = Joi.object({
     "string.base": "La descripción debe ser un texto",
     "string.max": "La descripción no puede tener más de {#limit} caracteres",
   }),
-
-  tamaño: Joi.number().positive().required().messages({
+  tamano: Joi.number().positive().required().messages({
     "number.base": "El tamaño debe ser un número",
     "number.positive": "El tamaño debe ser un valor positivo",
     "any.required": "El tamaño es obligatorio",
   }),
 
-  categoriaId: Joi.string().required().messages({
-    "string.base": "La categoría debe ser un identificador válido",
+  usuarioId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
+    "string.base": "El usuarioId debe ser un texto (ObjectId)",
+    "string.pattern.base": "El usuarioId debe ser un ObjectId válido",
+    "any.required": "El usuarioId es obligatorio",
+  }),
+
+  categoriaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
+    "string.base": "La categoría debe ser un texto (ObjectId)",
+    "string.pattern.base": "La categoriaId debe ser un ObjectId válido",
     "any.required": "La categoría es obligatoria",
+  }),
+
+  imagenUrl: Joi.string().uri().optional().messages({
+    "string.uri": "La imagenUrl debe ser una URL válida",
   }),
 });
 

@@ -1,59 +1,59 @@
-let categorias = [];
-let nextCategoriaId = 1;
+import {
+  obtenerCategoriasService,
+  crearCategoriaService,
+  actualizarCategoriaService,
+  eliminarCategoriaService,
+} from "../services/categorias.services.js";
 
-export const obtenerCategorias = (req, res) => {
-  res.json({ categorias });
+export const obtenerCategorias = async (req, res) => {
+  try {
+    const categorias = await obtenerCategoriasService();
+    res.json({ success: true, message: "Categorias obtenidas", data: categorias });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al obtener categorias", error: err.message });
+  }
 };
 
-export const agregarCategoria = (req, res) => {
-  const body = req.validatedBody || req.body;
-  const categoria = {
-    id: nextCategoriaId++,
-    nombre: body.nombre,
-    tipo: body.tipo,
-    descripcion: body.descripcion || "",
-  };
-  categorias.push(categoria);
-  res.status(201).json({ mensaje: "Categoria creada", categoria });
+export const agregarCategoria = async (req, res) => {
+  try {
+    const body = req.validatedBody || req.body;
+    const categoriaGuardar = {
+      nombre: body.nombre,
+      tipo: body.tipo,
+      descripcion: body.descripcion || "",
+    };
+    const categoria = await crearCategoriaService(categoriaGuardar);
+    res.status(201).json({ success: true, message: "Categoria creada", data: categoria });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al crear categoria", error: err.message });
+  }
 };
 
-export const editarCategoria = (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (Number.isNaN(id)) {
-    return res.status(400).json({ mensaje: "ID inválido" });
+export const editarCategoria = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.validatedBody || req.body;
+    const categoria = await actualizarCategoriaService(id, {
+      nombre: body.nombre,
+      tipo: body.tipo,
+      descripcion: body.descripcion,
+    });
+    if (!categoria) return res.status(404).json({ success: false, message: "Categoria no encontrada" });
+    res.json({ success: true, message: "Categoria actualizada", data: categoria });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al actualizar categoria", error: err.message });
   }
-
-  const body = req.validatedBody || req.body;
-  const index = categorias.findIndex((c) => c.id === id);
-  if (index === -1) {
-    return res.status(404).json({ mensaje: "Categoria no encontrada" });
-  }
-
-  const categoria = categorias[index];
-  const updated = {
-    ...categoria,
-    nombre: body.nombre !== undefined ? body.nombre : categoria.nombre,
-    tipo: body.tipo !== undefined ? body.tipo : categoria.tipo,
-    descripcion: body.descripcion !== undefined ? body.descripcion : categoria.descripcion,
-  };
-
-  categorias[index] = updated;
-  res.json({ mensaje: "Categoria actualizada", categoria: updated });
 };
 
-export const eliminarCategoria = (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (Number.isNaN(id)) {
-    return res.status(400).json({ mensaje: "ID inválido" });
+export const eliminarCategoria = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const categoria = await eliminarCategoriaService(id);
+    if (!categoria) return res.status(404).json({ success: false, message: "Categoria no encontrada" });
+    res.json({ success: true, message: "Categoria eliminada", data: categoria });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al eliminar categoria", error: err.message });
   }
-
-  const index = categorias.findIndex((c) => c.id === id);
-  if (index === -1) {
-    return res.status(404).json({ mensaje: "Categoria no encontrada" });
-  }
-
-  categorias.splice(index, 1);
-  res.json({ mensaje: "Categoria eliminada" });
 };
 
 export default { obtenerCategorias, agregarCategoria, editarCategoria, eliminarCategoria };

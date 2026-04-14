@@ -1,50 +1,73 @@
-let ecosistemas = [];
-let nextEcosistemaId = 1;
+import {
+  obtenerEcosistemasService,
+  obtenerEcosistemaPorIdService,
+  crearEcosistemaService,
+  actualizarEcosistemaService,
+  eliminarEcosistemaService,
+} from "../services/ecosistemas.services.js";
 
-export const obtenerEcosistemas = (req, res) => {
-  res.json({ ecosistemas });
+export const obtenerEcosistemas = async (req, res) => {
+  try {
+    const ecosistemas = await obtenerEcosistemasService();
+    res.json({ success: true, message: "Ecosistemas obtenidos", data: ecosistemas });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al obtener ecosistemas", error: err.message });
+  }
 };
 
-export const obtenerEcosistema = (req, res) => {
-  const id = Number(req.params.id);
-  const eco = ecosistemas.find(e => e.id === id);
-  if (!eco) return res.status(404).json({ mensaje: "Ecosistema no encontrado" });
-  res.json({ ecosistema: eco });
+export const obtenerEcosistema = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const eco = await obtenerEcosistemaPorIdService(id);
+    if (!eco) return res.status(404).json({ success: false, message: "Ecosistema no encontrado" });
+    res.json({ success: true, message: "Ecosistema obtenido", data: eco });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al obtener ecosistema", error: err.message });
+  }
 };
 
-export const agregarEcosistema = (req, res) => {
-  const body = req.validatedBody || req.body;
-  const ecosistema = {
-    id: nextEcosistemaId++,
-    nombre: body.nombre,
-    tipo: body.tipo,
-    descripcion: body.descripcion || "",
-    tamaño: body.tamaño || 0,
-    usuarioId: body.usuarioId || null,
-    categoriaId: body.categoriaId || null,
-    imagenUrl: body.imagenUrl || null,
-    creadoEn: new Date(),
-    actualizadoEn: new Date(),
-  };
-  ecosistemas.push(ecosistema);
-  res.status(201).json({ mensaje: "Ecosistema creado", ecosistema });
+export const agregarEcosistema = async (req, res) => {
+  try {
+    const body = req.validatedBody || req.body;
+    if (body.tamaño !== undefined && body.tamano === undefined) body.tamano = body.tamaño;
+    const ecosistemaGuardar = {
+      nombre: body.nombre,
+      tipo: body.tipo,
+      descripcion: body.descripcion || "",
+      tamano: body.tamano || 0,
+      usuarioId: body.usuarioId || null,
+      categoriaId: body.categoriaId || null,
+      imagenUrl: body.imagenUrl || null,
+    };
+    const ecosistema = await crearEcosistemaService(ecosistemaGuardar);
+    res.status(201).json({ success: true, message: "Ecosistema creado", data: ecosistema });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al crear ecosistema", error: err.message });
+  }
 };
 
-export const actualizarEcosistema = (req, res) => {
-  const id = Number(req.params.id);
-  const eco = ecosistemas.find(e => e.id === id);
-  if (!eco) return res.status(404).json({ mensaje: "Ecosistema no encontrado" });
-  const body = req.validatedBody || req.body;
-  Object.assign(eco, body, { actualizadoEn: new Date() });
-  res.json({ mensaje: "Ecosistema actualizado", ecosistema: eco });
+export const actualizarEcosistema = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.validatedBody || req.body;
+    if (body.tamaño !== undefined && body.tamano === undefined) body.tamano = body.tamaño;
+    const eco = await actualizarEcosistemaService(id, { ...body });
+    if (!eco) return res.status(404).json({ success: false, message: "Ecosistema no encontrado" });
+    res.json({ success: true, message: "Ecosistema actualizado", data: eco });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al actualizar ecosistema", error: err.message });
+  }
 };
 
-export const eliminarEcosistema = (req, res) => {
-  const id = Number(req.params.id);
-  const idx = ecosistemas.findIndex(e => e.id === id);
-  if (idx === -1) return res.status(404).json({ mensaje: "Ecosistema no encontrado" });
-  const eliminado = ecosistemas.splice(idx, 1)[0];
-  res.json({ mensaje: "Ecosistema eliminado", ecosistema: eliminado });
+export const eliminarEcosistema = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const eliminado = await eliminarEcosistemaService(id);
+    if (!eliminado) return res.status(404).json({ success: false, message: "Ecosistema no encontrado" });
+    res.json({ success: true, message: "Ecosistema eliminado", data: eliminado });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error al eliminar ecosistema", error: err.message });
+  }
 };
 
-export default { obtenerEcosistemas };
+export default { obtenerEcosistemas, obtenerEcosistema, agregarEcosistema, actualizarEcosistema, eliminarEcosistema };
