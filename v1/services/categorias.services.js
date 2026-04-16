@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import Categoria from "../models/categoria.model.js";
 
 export const obtenerCategoriasService = async () => {
@@ -5,6 +6,9 @@ export const obtenerCategoriasService = async () => {
 };
 
 export const obtenerCategoriaPorIdService = async (id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Categoria.findById(id);
 };
 
@@ -15,10 +19,16 @@ export const crearCategoriaService = async (categoriaGuardar) => {
 };
 
 export const actualizarCategoriaService = async (id, categoriaActualizar) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Categoria.findByIdAndUpdate(id, categoriaActualizar, { new: true });
 };
 
 export const eliminarCategoriaService = async (id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Categoria.findByIdAndDelete(id);
 };
 

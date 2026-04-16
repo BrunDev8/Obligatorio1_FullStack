@@ -4,7 +4,11 @@ export const obtenerUsuariosService = async () => {
   return await Usuario.find();
 };
 
-export const obtenerUsuarioPorIdService = async (id) => {
+export const obtenerUsuarioPorIdService = async (id) => { 
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
+
   return await Usuario.findById(id);
 };
 
@@ -19,10 +23,16 @@ export const crearUsuarioService = async (usuarioGuardar) => {
 };
 
 export const actualizarUsuarioService = async (id, usuarioActualizar) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Usuario.findByIdAndUpdate(id, usuarioActualizar, { new: true });
 };
 
 export const eliminarUsuarioService = async (id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Usuario.findByIdAndDelete(id);
 };
 

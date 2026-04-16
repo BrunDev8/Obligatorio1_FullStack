@@ -19,6 +19,7 @@ router.use("/auth", authRouter);
 //middleware para verificar de token
 router.use(authenticateMiddleware);
 
+//rutas protegidas, requieren token
 router.use("/usuarios", usuariosRouter);
 router.use("/ecosistemas", ecosistemasRouter);
 router.use("/registros", registrosRouter);

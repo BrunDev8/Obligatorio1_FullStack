@@ -1,10 +1,16 @@
 import Tarea from "../models/tarea.model.js";
 
-export const obtenerTareasPorEcosistemaService = async (ecosistemaId) => {
+export const obtenerTareasPorEcosistemaService = async (ecosistemaId) => {  
+  if (!isValidObjectId(ecosistemaId)) {
+    throw new Error("ID de ecosistema inválido");
+  }
   return await Tarea.find({ ecosistemaId });
 };
 
 export const obtenerTareaPorIdService = async (id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Tarea.findById(id);
 };
 
@@ -19,6 +25,9 @@ export const actualizarTareaService = async (id, tareaActualizar) => {
 };
 
 export const eliminarTareaService = async (id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Tarea.findByIdAndDelete(id);
 };
 
