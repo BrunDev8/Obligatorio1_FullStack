@@ -5,7 +5,7 @@ import { crearUsuarioSchema } from "../validators/usuarios.validators.js";
 
 const router = express.Router({ mergeParams: true });
 
-router.get("/:nombre", buscarUsuario);
+router.get("/:username", buscarUsuario);
 router.post("/", validateBodyMiddleware(crearUsuarioSchema), agregarUsuario );
 
 export default router;

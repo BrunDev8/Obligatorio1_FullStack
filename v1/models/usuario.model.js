@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const usuarioSchema = new mongoose.Schema(
   {
-    nombreUsuario: {
+    username: {
       type: String,
       required: true,
       lowercase: true,
@@ -14,7 +14,7 @@ const usuarioSchema = new mongoose.Schema(
       lowercase: true,
       unique: true,
     },
-    contraseña: {
+    password: {
       type: String,
       required: true,
     },

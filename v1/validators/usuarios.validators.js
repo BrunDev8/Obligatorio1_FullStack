@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const crearUsuarioSchema = Joi.object({
-  nombreUsuario: Joi.string().trim().lowercase().min(4).max(20).required().messages({
+  username: Joi.string().trim().lowercase().min(4).max(20).required().messages({
     "string.base": "El nombre de usuario debe ser un texto",
     "string.empty": "El nombre de usuario no puede estar vacío",
     "string.min": "El nombre de usuario debe tener al menos {#limit} caracteres",
@@ -16,7 +16,7 @@ export const crearUsuarioSchema = Joi.object({
     "any.required": "El email es obligatorio",
   }),
 
-  contraseña: Joi.string().min(6).max(30).required().messages({
+  password: Joi.string().min(6).max(30).required().messages({
     "string.base": "La contraseña debe ser un texto",
     "string.empty": "La contraseña no puede estar vacía",
     "string.min": "La contraseña debe tener al menos {#limit} caracteres",

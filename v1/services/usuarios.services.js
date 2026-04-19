@@ -12,8 +12,8 @@ export const obtenerUsuarioPorIdService = async (id) => {
   return await Usuario.findById(id);
 };
 
-export const obtenerUsuarioPorNombreService = async (nombreUsuario) => {
-  return await Usuario.findOne({ nombreUsuario: nombreUsuario.toLowerCase() });
+export const obtenerUsuarioPorNombreService = async (username) => {
+  return await Usuario.findOne({ username: username.toLowerCase() });
 };
 
 export const crearUsuarioService = async (usuarioGuardar) => {

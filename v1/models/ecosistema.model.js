@@ -8,7 +8,7 @@ const ecosistemaSchema = new mongoose.Schema(
     },
     tipo: {
       type: String,
-      enum: ["acuario", "planta"],
+      enum: ["acuario", "planta", "terrario"],
       required: true,
     },
     descripcion: {

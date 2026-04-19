@@ -7,11 +7,11 @@ const SALT_ROUNDS = 12;
 export const agregarUsuario = async (req, res) => {
   try {
     const body = req.validatedBody || req.body;
-    const hash = await bcrypt.hash(body.contraseña, SALT_ROUNDS);
+    const hash = await bcrypt.hash(body.password, SALT_ROUNDS);
     const usuarioGuardar = {
-      nombreUsuario: body.nombreUsuario,
+      username: body.username,
       email: body.email,
-      contraseña: hash,
+      password: hash,
       rol: body.rol || "usuario",
       plan: body.plan || "estandar",
     };
@@ -24,8 +24,8 @@ export const agregarUsuario = async (req, res) => {
 
 export const buscarUsuario = async (req, res) => {
   try {
-    const nombre = req.params.nombre;
-    const { error, value } = buscarUsuarioSchema.validate(nombre, { abortEarly: false });
+    const username = req.params.username;
+    const { error, value } = buscarUsuarioSchema.validate(username, { abortEarly: false });
     if (error) return res.status(400).json({ success: false, message: "Error en validación", error: error.details });
     const resultado = await obtenerUsuarioPorNombreService(value);
     res.json({ success: true, message: "Usuario(s) encontrado(s)", data: resultado });
