@@ -19,10 +19,12 @@ export const registerSchema = Joi.object({
         'any.only': 'Las contraseñas no coinciden',
         'string.empty': 'La confirmación de contraseña es obligatoria'
     }),
-    rol: Joi.string().trim().default('usuario').messages({
+    rol: Joi.string().trim().lowercase().valid('usuario', 'admin', 'administrador').default('usuario').messages({
+        'any.only': 'El rol debe ser "usuario" o "admin/administrador"',
         'string.base': 'El rol debe ser un texto'
     }),
-    plan: Joi.string().trim().default('estandar').messages({
+    plan: Joi.string().trim().valid('estandar', 'premium').default('estandar').messages({
+        'any.only': 'El plan debe ser "estandar" o "premium"',
         'string.base': 'El plan debe ser un texto'
     })
 });
