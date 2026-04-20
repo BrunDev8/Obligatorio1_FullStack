@@ -1,4 +1,5 @@
 import Usuario from "../models/usuario.model.js";
+import { isValidObjectId } from "mongoose";
 
 export const obtenerUsuariosService = async () => {
   return await Usuario.find();

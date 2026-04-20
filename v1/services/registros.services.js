@@ -1,4 +1,5 @@
 import Registro from "../models/registro.model.js";
+import { isValidObjectId } from "mongoose";
 
 
 export const obtenerRegistrosPorEcosistemaService = async (ecosistemaId) => {
@@ -18,9 +19,6 @@ export const obtenerRegistroPorIdService = async (id) => {
 export const crearRegistroService = async (registroGuardar) => {
   if (!isValidObjectId(registroGuardar.ecosistemaId)) {
     throw new Error("ID de ecosistema inválido");
-  }
-  if (!isValidObjectId(registroGuardar.usuarioId)) {
-    throw new Error("ID de usuario inválido");
   }
 
   const registro = new Registro(registroGuardar);

@@ -35,7 +35,7 @@ export const agregarEcosistema = async (req, res) => {
       tipo: body.tipo,
       descripcion: body.descripcion || "",
       tamano: body.tamano || 0,
-      usuarioId: body.usuarioId || null,
+      usuarioId: body.usuarioId || req.decoded.id,
       categoriaId: body.categoriaId || null,
       imagenUrl: body.imagenUrl || null,
     };

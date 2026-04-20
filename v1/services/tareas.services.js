@@ -1,4 +1,5 @@
 import Tarea from "../models/tarea.model.js";
+import { isValidObjectId } from "mongoose";
 
 export const obtenerTareasPorEcosistemaService = async (ecosistemaId) => {  
   if (!isValidObjectId(ecosistemaId)) {
@@ -21,6 +22,9 @@ export const crearTareaService = async (tareaGuardar) => {
 };
 
 export const actualizarTareaService = async (id, tareaActualizar) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("ID inválido");
+  }
   return await Tarea.findByIdAndUpdate(id, tareaActualizar, { new: true });
 };
 

@@ -9,21 +9,17 @@ import { authenticateMiddleware } from "./middlewares/authenticate.middleware.js
 
 
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
 // Rutas v1 
-
 //rutas de login y registro de usuarios, sin necesidad de token
 router.use("/auth", authRouter);
 
-//middleware para verificar de token
-router.use(authenticateMiddleware);
-
 //rutas protegidas, requieren token
-router.use("/usuarios", usuariosRouter);
-router.use("/ecosistemas", ecosistemasRouter);
-router.use("/registros", registrosRouter);
-router.use("/tareas", tareasRouter);
-router.use("/categorias", categoriasRouter);
+router.use("/usuarios", authenticateMiddleware, usuariosRouter);
+router.use("/ecosistemas", authenticateMiddleware, ecosistemasRouter);
+router.use("/registros", authenticateMiddleware, registrosRouter);
+router.use("/tareas", authenticateMiddleware, tareasRouter);
+router.use("/categorias", authenticateMiddleware, categoriasRouter);
 
 export default router;

@@ -42,4 +42,42 @@ export const crearTareaSchema = Joi.object({
   }),
 });
 
-export default { crearTareaSchema };
+export const actualizarTareaSchema = Joi.object({
+  ecosistemaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).messages({
+    "string.base": "El id del ecosistema debe ser un texto (ObjectId)",
+    "string.pattern.base": "El id del ecosistema debe ser un ObjectId válido",
+  }).optional(),
+
+  titulo: Joi.string().trim().min(3).messages({
+    "string.base": "El título debe ser un texto",
+    "string.empty": "El título no puede estar vacío",
+    "string.min": "El título debe tener al menos {#limit} caracteres",
+  }).optional(),
+
+  descripcion: Joi.string().allow("").max(500).messages({
+    "string.base": "La descripción debe ser un texto",
+    "string.max": "La descripción no puede tener más de {#limit} caracteres",
+  }).optional(),
+
+  tipo: Joi.string().valid("mantenimiento", "fertilizacion", "limpieza").messages({
+    "any.only": "El tipo de tarea debe ser: mantenimiento, fertilizacion o limpieza",
+  }).optional(),
+
+  frecuencia: Joi.string().valid("diaria", "semanal", "mensual").messages({
+    "any.only": "La frecuencia debe ser diaria, semanal o mensual",
+  }).optional(),
+
+  ultimaEjecucion: Joi.date().optional().allow(null).messages({
+    "date.base": "La fecha de la última ejecución debe ser una fecha válida",
+  }),
+
+  proximaEjecucion: Joi.date().optional().allow(null).messages({
+    "date.base": "La fecha de la próxima ejecución debe ser una fecha válida",
+  }),
+
+  completada: Joi.boolean().optional().messages({
+    "boolean.base": "El campo completada debe ser un booleano",
+  }),
+});
+
+export default { crearTareaSchema, actualizarTareaSchema };
