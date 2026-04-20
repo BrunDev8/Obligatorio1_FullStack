@@ -28,5 +28,3 @@ export const agregarRegistro = async (req, res) => {
     res.status(500).json({ success: false, message: "Error al crear registro", error: err.message });
   }
 };
-
-export default { obtenerRegistrosPorEcosistema };

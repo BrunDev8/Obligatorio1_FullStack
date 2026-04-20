@@ -9,13 +9,6 @@ export const obtenerRegistrosPorEcosistemaService = async (ecosistemaId) => {
   return await Registro.find({ ecosistemaId });
 };
 
-export const obtenerRegistroPorIdService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  } 
-  return await Registro.findById(id);
-};
-
 export const crearRegistroService = async (registroGuardar) => {
   if (!isValidObjectId(registroGuardar.ecosistemaId)) {
     throw new Error("ID de ecosistema inválido");
@@ -31,11 +24,4 @@ export const eliminarRegistroService = async (id) => {
     throw new Error("ID inválido");
   }
   return await Registro.findByIdAndDelete(id);
-};
-
-export default {
-  obtenerRegistrosPorEcosistemaService,
-  obtenerRegistroPorIdService,
-  crearRegistroService,
-  eliminarRegistroService,
 };

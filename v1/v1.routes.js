@@ -7,15 +7,12 @@ import tareasRouter from "./routes/tareas.routes.js";
 import categoriasRouter from "./routes/categorias.routes.js";
 import { authenticateMiddleware } from "./middlewares/authenticate.middleware.js";
 
-
-
 const router = express.Router();
 
-// Rutas v1 
-//rutas de login y registro de usuarios, sin necesidad de token
+// Públicas
 router.use("/auth", authRouter);
 
-//rutas protegidas, requieren token
+// Privadas
 router.use("/usuarios", authenticateMiddleware, usuariosRouter);
 router.use("/ecosistemas", authenticateMiddleware, ecosistemasRouter);
 router.use("/registros", authenticateMiddleware, registrosRouter);

@@ -55,5 +55,3 @@ export const eliminarCategoria = async (req, res) => {
     res.status(500).json({ success: false, message: "Error al eliminar categoria", error: err.message });
   }
 };
-
-export default { obtenerCategorias, agregarCategoria, editarCategoria, eliminarCategoria };

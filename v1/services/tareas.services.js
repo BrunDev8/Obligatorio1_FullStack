@@ -8,13 +8,6 @@ export const obtenerTareasPorEcosistemaService = async (ecosistemaId) => {
   return await Tarea.find({ ecosistemaId });
 };
 
-export const obtenerTareaPorIdService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  }
-  return await Tarea.findById(id);
-};
-
 export const crearTareaService = async (tareaGuardar) => {
   const tarea = new Tarea(tareaGuardar);
   await tarea.save();
@@ -33,12 +26,4 @@ export const eliminarTareaService = async (id) => {
     throw new Error("ID inválido");
   }
   return await Tarea.findByIdAndDelete(id);
-};
-
-export default {
-  obtenerTareasPorEcosistemaService,
-  obtenerTareaPorIdService,
-  crearTareaService,
-  actualizarTareaService,
-  eliminarTareaService,
 };

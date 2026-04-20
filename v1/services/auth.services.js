@@ -58,5 +58,3 @@ export const registrarUsuarioService = async (
 
   return { success: true, token, usuario };
 };
-
-export default { loginService, registrarUsuarioService };

@@ -1,8 +1,9 @@
 export const errorMiddleware = (err, req, res, next) => {
-    //solo en development
-    console.error(err.stack);
+    if (process.env.NODE_ENV === 'development') {
+        console.error(err.stack);
+    }
     res.status(err.status || 500).json({
         message: err.message || "Error interno del servidor",
-        details: err.details || null
+        details: process.env.NODE_ENV === 'development' ? err.details : null
     });
 }

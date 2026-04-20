@@ -69,5 +69,3 @@ export const eliminarEcosistema = async (req, res) => {
     res.status(500).json({ success: false, message: "Error al eliminar ecosistema", error: err.message });
   }
 };
-
-export default { obtenerEcosistemas, obtenerEcosistema, agregarEcosistema, actualizarEcosistema, eliminarEcosistema };

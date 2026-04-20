@@ -5,13 +5,6 @@ export const obtenerCategoriasService = async () => {
   return await Categoria.find();
 };
 
-export const obtenerCategoriaPorIdService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  }
-  return await Categoria.findById(id);
-};
-
 export const crearCategoriaService = async (categoriaGuardar) => {
   const categoria = new Categoria(categoriaGuardar);
   await categoria.save();
@@ -30,12 +23,4 @@ export const eliminarCategoriaService = async (id) => {
     throw new Error("ID inválido");
   }
   return await Categoria.findByIdAndDelete(id);
-};
-
-export default {
-  obtenerCategoriasService,
-  obtenerCategoriaPorIdService,
-  crearCategoriaService,
-  actualizarCategoriaService,
-  eliminarCategoriaService,
 };

@@ -45,5 +45,3 @@ export const actualizarTarea = async (req, res) => {
     res.status(500).json({ success: false, message: "Error al actualizar tarea", error: err.message });
   }
 };
-
-export default { obtenerTareasPorEcosistema };

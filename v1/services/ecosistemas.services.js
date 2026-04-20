@@ -33,11 +33,3 @@ export const eliminarEcosistemaService = async (id) => {
   }
   return await Ecosistema.findByIdAndDelete(id);
 };
-
-export default {
-  obtenerEcosistemasService,
-  obtenerEcosistemaPorIdService,
-  crearEcosistemaService,
-  actualizarEcosistemaService,
-  eliminarEcosistemaService,
-};
