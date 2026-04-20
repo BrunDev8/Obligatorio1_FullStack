@@ -1,17 +1,5 @@
-import { obtenerUsuarioPorNombreService, actualizarUsuarioService, obtenerUsuarioPorIdService } from "../services/usuarios.services.js";
-import { buscarUsuarioSchema, cambiarPlanSchema } from "../validators/usuarios.validators.js";
-
-export const buscarUsuario = async (req, res) => {
-  try {
-    const username = req.params.username;
-    const { error, value } = buscarUsuarioSchema.validate(username, { abortEarly: false });
-    if (error) return res.status(400).json({ success: false, message: "Error en validación", error: error.details });
-    const resultado = await obtenerUsuarioPorNombreService(value);
-    res.json({ success: true, message: "Usuario(s) encontrado(s)", data: resultado });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Error al buscar usuario", error: err.message });
-  }
-};
+import { obtenerUsuarioPorIdService, actualizarUsuarioService } from "../services/usuarios.services.js";
+import { cambiarPlanSchema } from "../validators/usuarios.validators.js";
 
 export const cambiarPlan = async (req, res) => {
   try {
