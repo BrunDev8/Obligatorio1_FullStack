@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const registroSchema = new mongoose.Schema(
+const registroParametroSchema = new mongoose.Schema(
   {
     ecosistemaId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -53,4 +53,4 @@ const registroSchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model("Registro", registroSchema);
+export default mongoose.model("RegistroParametro", registroParametroSchema, "registroParametro");

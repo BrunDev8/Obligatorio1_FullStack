@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const crearRegistroSchema = Joi.object({
+export const crearRegistroParametroSchema = Joi.object({
   ecosistemaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
     "string.base": "El id del ecosistema debe ser un texto (ObjectId)",
     "string.pattern.base": "El id del ecosistema debe ser un ObjectId válido",
@@ -37,4 +37,6 @@ export const crearRegistroSchema = Joi.object({
   }),
 });
 
-export default { crearRegistroSchema };
+export const crearRegistroSchema = crearRegistroParametroSchema;
+
+export default { crearRegistroParametroSchema, crearRegistroSchema };

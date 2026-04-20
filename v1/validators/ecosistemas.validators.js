@@ -1,6 +1,8 @@
 import Joi from "joi";
 
-export const crearEcosistemaSchema = Joi.object({
+const aliasTamano = (schema) => schema.rename("tamaño", "tamano", { ignoreUndefined: true, override: true });
+
+export const crearEcosistemaSchema = aliasTamano(Joi.object({
   nombre: Joi.string().trim().min(3).max(30).required().messages({
     "string.base": "El nombre del ecosistema debe ser un texto",
     "string.empty": "El nombre del ecosistema no puede estar vacío",
@@ -9,11 +11,6 @@ export const crearEcosistemaSchema = Joi.object({
     "any.required": "El nombre del ecosistema es obligatorio",
   }),
 
-  tipo: Joi.string().valid("acuario", "planta", "terrario").required().messages({
-    "any.only": "El tipo debe ser acuario, planta o terrario",
-    "any.required": "El tipo es obligatorio",
-  }),
-
   descripcion: Joi.string().allow("").max(200).messages({
     "string.base": "La descripción debe ser un texto",
     "string.max": "La descripción no puede tener más de {#limit} caracteres",
@@ -28,17 +25,18 @@ export const crearEcosistemaSchema = Joi.object({
     "string.pattern.base": "El usuarioId debe ser un ObjectId válido",
   }).optional(),
 
-  categoriaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).messages({
+  categoriaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
     "string.base": "La categoría debe ser un texto (ObjectId)",
     "string.pattern.base": "La categoriaId debe ser un ObjectId válido",
-  }).optional(),
+    "any.required": "La categoriaId es obligatoria",
+  }),
 
   imagenUrl: Joi.string().uri().optional().messages({
     "string.uri": "La imagenUrl debe ser una URL válida",
   }),
-});
+}));
 
-export const actualizarEcosistemaSchema = Joi.object({
+export const actualizarEcosistemaSchema = aliasTamano(Joi.object({
   nombre: Joi.string().trim().min(3).max(30).messages({
     "string.base": "El nombre del ecosistema debe ser un texto",
     "string.empty": "El nombre del ecosistema no puede estar vacío",
@@ -46,10 +44,6 @@ export const actualizarEcosistemaSchema = Joi.object({
     "string.max": "El nombre del ecosistema no puede tener más de {#limit} caracteres",
   }).optional(),
 
-  tipo: Joi.string().valid("acuario", "planta", "terrario").messages({
-    "any.only": "El tipo debe ser acuario, planta o terrario",
-  }).optional(),
-
   descripcion: Joi.string().allow("").max(200).messages({
     "string.base": "La descripción debe ser un texto",
     "string.max": "La descripción no puede tener más de {#limit} caracteres",
@@ -73,6 +67,6 @@ export const actualizarEcosistemaSchema = Joi.object({
   imagenUrl: Joi.string().uri().optional().messages({
     "string.uri": "La imagenUrl debe ser una URL válida",
   }),
-});
+}));
 
 export default { crearEcosistemaSchema, actualizarEcosistemaSchema };

@@ -6,11 +6,6 @@ const ecosistemaSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    tipo: {
-      type: String,
-      enum: ["acuario", "planta", "terrario"],
-      required: true,
-    },
     descripcion: {
       type: String,
     },
@@ -25,6 +20,7 @@ const ecosistemaSchema = new mongoose.Schema(
     categoriaId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Categoria",
+      required: true,
     },
     imagenUrl: { type: String },
   },
