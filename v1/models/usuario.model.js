@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const usuarioSchema = new mongoose.Schema(
   {
@@ -20,7 +21,7 @@ const usuarioSchema = new mongoose.Schema(
     },
     rol: {
       type: String,
-      enum: ["usuario", "admin"],
+      enum: ["usuario", "admin", "administrador"],
       default: "usuario",
     },
     plan: {
@@ -36,5 +37,11 @@ const usuarioSchema = new mongoose.Schema(
     },
   },
 );
+
+usuarioSchema.pre("save", function () {
+    if (!this.isModified("password")) return
+    this.password = bcrypt.hashSync(this.password, Number(process.env.SALT_ROUNDS));
+});
+
 
 export default mongoose.model("Usuario", usuarioSchema);

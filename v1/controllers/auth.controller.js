@@ -15,7 +15,7 @@ export const registrarUsuario = async (req, res) => {
     try {
         const usuario = req.validatedBody || req.body;
         const result = await registrarUsuarioService(usuario);
-        res.json({ message: "Usuario registrado correctamente", token: result.token });
+        res.json({ message: "Usuario registrado correctamente" });
     } catch (err) {
         res.status(500).json({ message: "Error al registrar usuario", error: err.message });
     }
