@@ -5,8 +5,8 @@ export const authenticateMiddleware = (req, res, next) => {
     if (!authHeader) {
         return res.status(401).json({ message: "No se proporcionó un token de autenticación" });
     }
-    const token = authHeader.split(" ")[1];
-    if(!token) {
+    const [scheme, token] = authHeader.split(" ");
+    if (scheme !== "Bearer" || !token) {
         return res.status(401).json({ message: "Token de autenticación no válido" });
     }
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
