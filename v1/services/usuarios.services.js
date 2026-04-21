@@ -7,7 +7,7 @@ const createBadRequestError = (message) => {
   return error;
 };
 
-export const obtenerUsuarioPorIdService = async (id) => { 
+export const obtenerUsuarioPorIdService = async (id) => {
   if (!isValidObjectId(id)) {
     throw createBadRequestError("ID inválido");
   }
@@ -20,5 +20,8 @@ export const actualizarUsuarioService = async (id, usuarioActualizar) => {
     throw createBadRequestError("ID inválido");
   }
 
-  return await Usuario.findByIdAndUpdate(id, usuarioActualizar, { new: true, runValidators: true }).select("-password");
+  return await Usuario.findByIdAndUpdate(id, usuarioActualizar, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
 };

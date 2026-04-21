@@ -15,7 +15,9 @@ export const actualizarCategoriaService = async (id, categoriaActualizar) => {
   if (!isValidObjectId(id)) {
     throw new Error("ID inválido");
   }
-  return await Categoria.findByIdAndUpdate(id, categoriaActualizar, { new: true });
+  return await Categoria.findByIdAndUpdate(id, categoriaActualizar, {
+    new: true,
+  });
 };
 
 export const eliminarCategoriaService = async (id) => {

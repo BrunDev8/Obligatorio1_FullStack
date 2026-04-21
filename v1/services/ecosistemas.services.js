@@ -10,7 +10,8 @@ const crearErrorHttp = (message, statusCode) => {
 
 const categoriaProyeccion = "nombre tipo descripcion";
 
-const escaparExpresionRegular = (valor) => valor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escaparExpresionRegular = (valor) =>
+  valor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const validarCategoriaExistente = async (categoriaId) => {
   if (!isValidObjectId(categoriaId)) {
@@ -23,10 +24,12 @@ const validarCategoriaExistente = async (categoriaId) => {
   }
 };
 
-const poblarCategoria = (consulta) => consulta.populate({ path: "categoriaId", select: categoriaProyeccion });
+const poblarCategoria = (consulta) =>
+  consulta.populate({ path: "categoriaId", select: categoriaProyeccion });
 
 export const obtenerEcosistemasService = async ({ categoriaTipo } = {}) => {
-  const tipoNormalizado = typeof categoriaTipo === "string" ? categoriaTipo.trim() : "";
+  const tipoNormalizado =
+    typeof categoriaTipo === "string" ? categoriaTipo.trim() : "";
 
   if (tipoNormalizado) {
     const categorias = await Categoria.find({
@@ -40,7 +43,9 @@ export const obtenerEcosistemasService = async ({ categoriaTipo } = {}) => {
     }
 
     const categoriaIds = categorias.map((categoria) => categoria._id);
-    return poblarCategoria(Ecosistema.find({ categoriaId: { $in: categoriaIds } }));
+    return poblarCategoria(
+      Ecosistema.find({ categoriaId: { $in: categoriaIds } }),
+    );
   }
 
   return poblarCategoria(Ecosistema.find());
@@ -69,7 +74,12 @@ export const actualizarEcosistemaService = async (id, ecosistemaActualizar) => {
   if (ecosistemaActualizar.categoriaId !== undefined) {
     await validarCategoriaExistente(ecosistemaActualizar.categoriaId);
   }
-  return poblarCategoria(Ecosistema.findByIdAndUpdate(id, ecosistemaActualizar, { new: true, runValidators: true }));
+  return poblarCategoria(
+    Ecosistema.findByIdAndUpdate(id, ecosistemaActualizar, {
+      new: true,
+      runValidators: true,
+    }),
+  );
 };
 
 export const eliminarEcosistemaService = async (id) => {

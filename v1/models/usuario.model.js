@@ -39,9 +39,11 @@ const usuarioSchema = new mongoose.Schema(
 );
 
 usuarioSchema.pre("save", function () {
-    if (!this.isModified("password")) return
-    this.password = bcrypt.hashSync(this.password, Number(process.env.SALT_ROUNDS));
+  if (!this.isModified("password")) return;
+  this.password = bcrypt.hashSync(
+    this.password,
+    Number(process.env.SALT_ROUNDS),
+  );
 });
-
 
 export default mongoose.model("Usuario", usuarioSchema);

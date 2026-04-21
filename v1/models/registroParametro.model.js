@@ -53,4 +53,8 @@ const registroParametroSchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model("RegistroParametro", registroParametroSchema, "registroParametro");
+export default mongoose.model(
+  "RegistroParametro",
+  registroParametroSchema,
+  "registroParametro",
+);

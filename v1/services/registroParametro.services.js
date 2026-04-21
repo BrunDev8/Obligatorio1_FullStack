@@ -7,14 +7,18 @@ const crearErrorHttp = (message, statusCode) => {
   return error;
 };
 
-export const obtenerRegistroParametrosPorEcosistemaService = async (ecosistemaId) => {
+export const obtenerRegistroParametrosPorEcosistemaService = async (
+  ecosistemaId,
+) => {
   if (!isValidObjectId(ecosistemaId)) {
     throw crearErrorHttp("ID de ecosistema inválido", 400);
   }
   return RegistroParametro.find({ ecosistemaId });
 };
 
-export const crearRegistroParametroService = async (registroParametroGuardar) => {
+export const crearRegistroParametroService = async (
+  registroParametroGuardar,
+) => {
   if (!isValidObjectId(registroParametroGuardar.ecosistemaId)) {
     throw crearErrorHttp("ID de ecosistema inválido", 400);
   }
@@ -31,6 +35,7 @@ export const eliminarRegistroParametroService = async (id) => {
   return RegistroParametro.findByIdAndDelete(id);
 };
 
-export const obtenerRegistrosPorEcosistemaService = obtenerRegistroParametrosPorEcosistemaService;
+export const obtenerRegistrosPorEcosistemaService =
+  obtenerRegistroParametrosPorEcosistemaService;
 export const crearRegistroService = crearRegistroParametroService;
 export const eliminarRegistroService = eliminarRegistroParametroService;

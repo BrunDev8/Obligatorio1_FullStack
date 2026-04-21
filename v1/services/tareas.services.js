@@ -1,7 +1,7 @@
 import Tarea from "../models/tarea.model.js";
 import { isValidObjectId } from "mongoose";
 
-export const obtenerTareasPorEcosistemaService = async (ecosistemaId) => {  
+export const obtenerTareasPorEcosistemaService = async (ecosistemaId) => {
   if (!isValidObjectId(ecosistemaId)) {
     throw new Error("ID de ecosistema inválido");
   }

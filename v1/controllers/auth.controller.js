@@ -1,22 +1,33 @@
-import { loginService, registrarUsuarioService } from "../services/auth.services.js";
+import {
+  loginService,
+  registrarUsuarioService,
+} from "../services/auth.services.js";
 
 export const login = async (req, res) => {
-    try {
-        const { email, password } = req.validatedBody || req.body;
-        const result = await loginService(email, password);
-        if (result.message) return res.status(401).json({ message: result.message });
-        res.json({ message: "Usuario ingresado correctamente", token: result.token });
-    } catch (err) {
-        res.status(500).json({ message: "Error al ingresar usuario", error: err.message });
-    }
+  try {
+    const { email, password } = req.validatedBody || req.body;
+    const result = await loginService(email, password);
+    if (result.message)
+      return res.status(401).json({ message: result.message });
+    res.json({
+      message: "Usuario ingresado correctamente",
+      token: result.token,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error al ingresar usuario", error: err.message });
+  }
 };
 
 export const registrarUsuario = async (req, res) => {
-    try {
-        const usuario = req.validatedBody || req.body;
-        const result = await registrarUsuarioService(usuario);
-        res.json({ message: "Usuario registrado correctamente" });
-    } catch (err) {
-        res.status(500).json({ message: "Error al registrar usuario", error: err.message });
-    }
+  try {
+    const usuario = req.validatedBody || req.body;
+    const result = await registrarUsuarioService(usuario);
+    res.json({ message: "Usuario registrado correctamente" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error al registrar usuario", error: err.message });
+  }
 };

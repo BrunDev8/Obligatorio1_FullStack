@@ -6,8 +6,13 @@ import {
 export const obtenerRegistroParametrosPorEcosistema = async (req, res) => {
   try {
     const ecosistemaId = req.params.ecosistemaId;
-    const registroParametros = await obtenerRegistroParametrosPorEcosistemaService(ecosistemaId);
-    res.json({ success: true, message: "Registros de parámetros obtenidos", data: registroParametros });
+    const registroParametros =
+      await obtenerRegistroParametrosPorEcosistemaService(ecosistemaId);
+    res.json({
+      success: true,
+      message: "Registros de parámetros obtenidos",
+      data: registroParametros,
+    });
   } catch (err) {
     res.status(err.statusCode || 500).json({
       success: false,
@@ -27,10 +32,20 @@ export const agregarRegistroParametro = async (req, res) => {
       humedad: body.humedad,
       nitratos: body.nitratos,
       notas: body.notas || "",
-      fechaRegistro: body.fechaRegistro ? new Date(body.fechaRegistro) : new Date(),
+      fechaRegistro: body.fechaRegistro
+        ? new Date(body.fechaRegistro)
+        : new Date(),
     };
-    const registroParametro = await crearRegistroParametroService(registroParametroGuardar);
-    res.status(201).json({ success: true, message: "Registro de parámetros creado", data: registroParametro });
+    const registroParametro = await crearRegistroParametroService(
+      registroParametroGuardar,
+    );
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Registro de parámetros creado",
+        data: registroParametro,
+      });
   } catch (err) {
     res.status(err.statusCode || 500).json({
       success: false,
@@ -40,5 +55,6 @@ export const agregarRegistroParametro = async (req, res) => {
   }
 };
 
-export const obtenerRegistrosPorEcosistema = obtenerRegistroParametrosPorEcosistema;
+export const obtenerRegistrosPorEcosistema =
+  obtenerRegistroParametrosPorEcosistema;
 export const agregarRegistro = agregarRegistroParametro;

@@ -1,19 +1,25 @@
 import jwt from "jsonwebtoken";
 
 export const authenticateMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ message: "No se proporcionó un token de autenticación" });
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res
+      .status(401)
+      .json({ message: "No se proporcionó un token de autenticación" });
+  }
+  const [scheme, token] = authHeader.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    return res
+      .status(401)
+      .json({ message: "Token de autenticación no válido" });
+  }
+  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res
+        .status(401)
+        .json({ message: "Token de autenticación inválido" });
     }
-    const [scheme, token] = authHeader.split(" ");
-    if (scheme !== "Bearer" || !token) {
-        return res.status(401).json({ message: "Token de autenticación no válido" });
-    }
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ message: "Token de autenticación inválido" });
-        }
-        req.decoded = decoded;
-        next();
-    });
-}
+    req.decoded = decoded;
+    next();
+  });
+};
