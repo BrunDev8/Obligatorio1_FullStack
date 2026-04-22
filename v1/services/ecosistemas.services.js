@@ -1,4 +1,5 @@
 import Ecosistema from "../models/ecosistema.model.js";
+import Usuario from "../models/usuario.model.js";
 import Categoria from "../models/categoria.model.js";
 import { isValidObjectId } from "mongoose";
 
@@ -27,9 +28,11 @@ const validarCategoriaExistente = async (categoriaId) => {
 const poblarCategoria = (consulta) =>
   consulta.populate({ path: "categoriaId", select: categoriaProyeccion });
 
-export const obtenerEcosistemasService = async ({ categoriaTipo } = {}) => {
-  const tipoNormalizado =
-    typeof categoriaTipo === "string" ? categoriaTipo.trim() : "";
+export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit = 10 } = {}) => {
+  const tipoNormalizado = typeof categoriaTipo === "string" ? categoriaTipo.trim() : "";
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
+  const skip = (pageNum - 1) * limitNum;
 
   if (tipoNormalizado) {
     const categorias = await Categoria.find({
@@ -39,26 +42,55 @@ export const obtenerEcosistemasService = async ({ categoriaTipo } = {}) => {
       .lean();
 
     if (categorias.length === 0) {
-      return [];
+      return { data: [], total: 0, page: pageNum, limit: limitNum, totalPages: 0 };
     }
 
     const categoriaIds = categorias.map((categoria) => categoria._id);
-    return poblarCategoria(
-      Ecosistema.find({ categoriaId: { $in: categoriaIds } }),
-    );
+    const filter = { categoriaId: { $in: categoriaIds } };
+    const total = await Ecosistema.countDocuments(filter);
+    const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
+    const totalPages = Math.ceil(total / limitNum);
+    return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
   }
 
-  return poblarCategoria(Ecosistema.find());
+  const total = await Ecosistema.countDocuments();
+  const docs = await poblarCategoria(Ecosistema.find().skip(skip).limit(limitNum));
+  const totalPages = Math.ceil(total / limitNum);
+  return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
 };
 
-export const obtenerEcosistemaPorIdService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw crearErrorHttp("ID de ecosistema inválido", 400);
-  }
-  return poblarCategoria(Ecosistema.findById(id));
+export const buscarEcosistemasPorCategoriaService = async (categoriaId, { page = 1, limit = 10 } = {}) => {
+  await validarCategoriaExistente(categoriaId);
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
+  const skip = (pageNum - 1) * limitNum;
+
+  const filter = { categoriaId };
+  const total = await Ecosistema.countDocuments(filter);
+  const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
+  const totalPages = Math.ceil(total / limitNum);
+  return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
 };
 
 export const crearEcosistemaService = async (ecosistemaGuardar) => {
+  // Validar usuario
+  if (!ecosistemaGuardar.usuarioId || !isValidObjectId(ecosistemaGuardar.usuarioId)) {
+    throw crearErrorHttp("ID de usuario inválido", 400);
+  }
+
+  const usuario = await Usuario.findById(ecosistemaGuardar.usuarioId).select("plan").lean();
+  if (!usuario) {
+    throw crearErrorHttp("Usuario no encontrado", 404);
+  }
+
+  // Si no es premium, aplicar límite de 4 ecosistemas
+  if (usuario.plan !== "premium") {
+    const count = await Ecosistema.countDocuments({ usuarioId: ecosistemaGuardar.usuarioId });
+    if (count >= 4) {
+      throw crearErrorHttp("Límite de ecosistemas alcanzado para usuarios estándar", 403);
+    }
+  }
+
   await validarCategoriaExistente(ecosistemaGuardar.categoriaId);
 
   const ecosistema = new Ecosistema(ecosistemaGuardar);

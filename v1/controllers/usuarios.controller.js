@@ -8,6 +8,10 @@ export const cambiarPlan = async (req, res) => {
     const userId = req.decoded.id;
     const { plan } = req.validatedBody;
 
+    if (!plan) {
+      return res.status(400).json({ success: false, message: "Campo 'plan' requerido" });
+    }
+
     const usuarioActual = await obtenerUsuarioPorIdService(userId);
     if (!usuarioActual) {
       return res

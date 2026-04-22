@@ -8,11 +8,11 @@ import {
 export const obtenerCategorias = async (req, res) => {
   try {
     const categorias = await obtenerCategoriasService();
-    res.json({
-      success: true,
-      message: "Categorias obtenidas",
-      data: categorias,
-    });
+    if (Array.isArray(categorias) && categorias.length === 0) {
+      return res.json({ success: true, message: "No se encontraron categorias", data: categorias });
+    }
+
+    res.json({ success: true, message: "Categorias obtenidas", data: categorias });
   } catch (err) {
     res
       .status(500)
@@ -33,9 +33,10 @@ export const agregarCategoria = async (req, res) => {
       descripcion: body.descripcion || "",
     };
     const categoria = await crearCategoriaService(categoriaGuardar);
-    res
-      .status(201)
-      .json({ success: true, message: "Categoria creada", data: categoria });
+    if (!categoria) {
+      return res.status(500).json({ success: false, message: "No se pudo crear la categoria" });
+    }
+    res.status(201).json({ success: true, message: "Categoria creada", data: categoria });
   } catch (err) {
     res
       .status(500)

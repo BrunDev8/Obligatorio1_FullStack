@@ -8,6 +8,10 @@ export const obtenerTareasPorEcosistema = async (req, res) => {
   try {
     const ecosistemaId = req.params.ecosistemaId;
     const tareas = await obtenerTareasPorEcosistemaService(ecosistemaId);
+    if (Array.isArray(tareas) && tareas.length === 0) {
+      return res.json({ success: true, message: "No se encontraron tareas para el ecosistema", data: tareas });
+    }
+
     res.json({ success: true, message: "Tareas obtenidas", data: tareas });
   } catch (err) {
     res
@@ -38,9 +42,10 @@ export const agregarTarea = async (req, res) => {
       completada: !!body.completada,
     };
     const tarea = await crearTareaService(tareaGuardar);
-    res
-      .status(201)
-      .json({ success: true, message: "Tarea creada", data: tarea });
+    if (!tarea) {
+      return res.status(500).json({ success: false, message: "No se pudo crear la tarea" });
+    }
+    res.status(201).json({ success: true, message: "Tarea creada", data: tarea });
   } catch (err) {
     res
       .status(500)

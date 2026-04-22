@@ -1,6 +1,6 @@
 import {
   obtenerEcosistemasService,
-  obtenerEcosistemaPorIdService,
+  buscarEcosistemasPorCategoriaService,
   crearEcosistemaService,
   actualizarEcosistemaService,
   eliminarEcosistemaService,
@@ -8,14 +8,24 @@ import {
 
 export const obtenerEcosistemas = async (req, res) => {
   try {
-    const ecosistemas = await obtenerEcosistemasService({
+    const page = req.query.page;
+    const limit = req.query.limit;
+    const result = await obtenerEcosistemasService({
       categoriaTipo: req.query.categoriaTipo,
+      page,
+      limit,
     });
-    res.json({
-      success: true,
-      message: "Ecosistemas obtenidos",
-      data: ecosistemas,
-    });
+
+    const { data, total, page: pageNum, limit: limitNum, totalPages } = result;
+
+    if (Array.isArray(data) && data.length === 0) {
+      const mensaje = req.query.categoriaTipo
+        ? "No se encontraron ecosistemas para la categoría especificada"
+        : "No se encontraron ecosistemas";
+      return res.json({ success: true, message: mensaje, data, pagination: { total, page: pageNum, limit: limitNum, totalPages } });
+    }
+
+    res.json({ success: true, message: "Ecosistemas obtenidos", data, pagination: { total, page: pageNum, limit: limitNum, totalPages } });
   } catch (err) {
     res
       .status(err.statusCode || 500)
@@ -27,21 +37,25 @@ export const obtenerEcosistemas = async (req, res) => {
   }
 };
 
-export const obtenerEcosistema = async (req, res) => {
+export const buscarEcosistemasPorCategoria = async (req, res) => {
   try {
-    const id = req.params.id;
-    const eco = await obtenerEcosistemaPorIdService(id);
-    if (!eco)
-      return res
-        .status(404)
-        .json({ success: false, message: "Ecosistema no encontrado" });
-    res.json({ success: true, message: "Ecosistema obtenido", data: eco });
+    const categoriaId = req.params.categoriaId;
+    const page = req.query.page;
+    const limit = req.query.limit;
+    const result = await buscarEcosistemasPorCategoriaService(categoriaId, { page, limit });
+    const { data, total, page: pageNum, limit: limitNum, totalPages } = result;
+
+    if (Array.isArray(data) && data.length === 0) {
+      return res.json({ success: true, message: "No se encontraron ecosistemas para la categoría", data, pagination: { total, page: pageNum, limit: limitNum, totalPages } });
+    }
+
+    res.json({ success: true, message: "Ecosistemas por categoría obtenidos", data, pagination: { total, page: pageNum, limit: limitNum, totalPages } });
   } catch (err) {
     res
       .status(err.statusCode || 500)
       .json({
         success: false,
-        message: "Error al obtener ecosistema",
+        message: "Error al obtener ecosistemas por categoría",
         error: err.message,
       });
   }
