@@ -1,5 +1,5 @@
 export const validateBodyMiddleware = (schema) => (req, res, next) => {
-  const { error, value } = schema.validate(req.body, { abortEarly: false });
+  const { error, value } = schema.validate(req.body, { abortEarly: false, convert: true, stripUnknown: true });
   if (error) {
     return res
       .status(400)

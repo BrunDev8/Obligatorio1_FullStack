@@ -19,12 +19,12 @@ export const crearTareaSchema = Joi.object({
     "string.max": "La descripción no puede tener más de {#limit} caracteres",
   }).optional(),
 
-  tipo: Joi.string().valid("mantenimiento", "fertilizacion", "limpieza").required().messages({
+  tipo: Joi.string().trim().lowercase().valid("mantenimiento", "fertilizacion", "limpieza").required().messages({
     "any.only": "El tipo de tarea debe ser: mantenimiento, fertilizacion o limpieza",
     "any.required": "El tipo de tarea es obligatorio",
   }),
 
-  frecuencia: Joi.string().valid("diaria", "semanal", "mensual").required().messages({
+  frecuencia: Joi.string().trim().lowercase().valid("diaria", "semanal", "mensual").required().messages({
     "any.only": "La frecuencia debe ser diaria, semanal o mensual",
     "any.required": "La frecuencia es obligatoria",
   }),
@@ -59,11 +59,11 @@ export const actualizarTareaSchema = Joi.object({
     "string.max": "La descripción no puede tener más de {#limit} caracteres",
   }).optional(),
 
-  tipo: Joi.string().valid("mantenimiento", "fertilizacion", "limpieza").messages({
+  tipo: Joi.string().trim().lowercase().valid("mantenimiento", "fertilizacion", "limpieza").messages({
     "any.only": "El tipo de tarea debe ser: mantenimiento, fertilizacion o limpieza",
   }).optional(),
 
-  frecuencia: Joi.string().valid("diaria", "semanal", "mensual").messages({
+  frecuencia: Joi.string().trim().lowercase().valid("diaria", "semanal", "mensual").messages({
     "any.only": "La frecuencia debe ser diaria, semanal o mensual",
   }).optional(),
 

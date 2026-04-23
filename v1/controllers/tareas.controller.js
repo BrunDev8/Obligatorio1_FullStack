@@ -1,7 +1,6 @@
 import {
   obtenerTareasPorEcosistemaService,
   crearTareaService,
-  actualizarTareaService,
 } from "../services/tareas.services.js";
 
 export const obtenerTareasPorEcosistema = async (req, res) => {
@@ -57,23 +56,3 @@ export const agregarTarea = async (req, res) => {
   }
 };
 
-export const actualizarTarea = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const body = req.validatedBody || req.body;
-    const tarea = await actualizarTareaService(id, { ...body });
-    if (!tarea)
-      return res
-        .status(404)
-        .json({ success: false, message: "Tarea no encontrada" });
-    res.json({ success: true, message: "Tarea actualizada", data: tarea });
-  } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error al actualizar tarea",
-        error: err.message,
-      });
-  }
-};
