@@ -6,6 +6,7 @@ import registroParametroRouter from "./routes/registroParametro.routes.js";
 import tareasRouter from "./routes/tareas.routes.js";
 import categoriasRouter from "./routes/categorias.routes.js";
 import { authenticateMiddleware } from "./middlewares/authenticate.middleware.js";
+import aiRouter from "./routes/ai.routes.js";
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use("/ecosistemas", authenticateMiddleware, ecosistemasRouter);
 router.use("/registro-parametros", authenticateMiddleware, registroParametroRouter);
 router.use("/tareas", authenticateMiddleware, tareasRouter);
 router.use("/categorias", authenticateMiddleware, categoriasRouter);
+router.use("/ai", aiRouter);
 
 export default router;

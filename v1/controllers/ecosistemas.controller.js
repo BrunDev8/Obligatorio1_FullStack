@@ -5,6 +5,7 @@ import {
   actualizarEcosistemaService,
   eliminarEcosistemaService,
 } from "../services/ecosistemas.services.js";
+import { generateEcosystemTip } from "./ai.controllers.js";
 
 export const obtenerEcosistemas = async (req, res) => {
   try {
@@ -73,9 +74,18 @@ export const agregarEcosistema = async (req, res) => {
       imagenUrl: body.imagenUrl || null,
     };
     const ecosistema = await crearEcosistemaService(ecosistemaGuardar);
+    // Attempt to generate a short AI tip for this ecosystem name. If it fails, still return success.
+    let aiTip = null;
+    try {
+      aiTip = await generateEcosystemTip(ecosistema.nombre || ecosistemaGuardar.nombre);
+    } catch (err) {
+      // log and continue
+      console.error('AI tip generation failed:', err?.toString());
+    }
+
     res
       .status(201)
-      .json({ success: true, message: "Ecosistema creado", data: ecosistema });
+      .json({ success: true, message: "Ecosistema creado", data: ecosistema, aiTip });
   } catch (err) {
     res
       .status(err.statusCode || 500)
