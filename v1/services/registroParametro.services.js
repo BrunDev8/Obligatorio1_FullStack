@@ -28,14 +28,7 @@ export const crearRegistroParametroService = async (
   return registroParametro;
 };
 
-export const eliminarRegistroParametroService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw crearErrorHttp("ID inválido", 400);
-  }
-  return RegistroParametro.findByIdAndDelete(id);
-};
 
 export const obtenerRegistrosPorEcosistemaService =
   obtenerRegistroParametrosPorEcosistemaService;
 export const crearRegistroService = crearRegistroParametroService;
-export const eliminarRegistroService = eliminarRegistroParametroService;

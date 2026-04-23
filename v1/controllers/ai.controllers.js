@@ -38,10 +38,9 @@ export const useGemini25Flash = async (req, res) => {
 
 export async function generateEcosystemTip(ecosystemName) {
     if (!ecosystemName) return null;
-    const prompt = `Provee un consejo breve pero cientifico sobre el cuidado del ecosistema llamado "${ecosystemName}". Sé conciso y útil.`;
+    const prompt = `Provee un consejo breve sobre el cuidado del ecosistema llamado "${ecosystemName}". Sé conciso y útil.`;
     try {
         const { final } = await callGemini(prompt);
-        // strip surrounding whitespace
         return final ? String(final).trim() : null;
     } catch (err) {
         console.error('Error generando tip de ecosistema:', err?.toString());
@@ -57,7 +56,6 @@ export async function generateEcosystemTip(ecosystemName) {
 
 function generateLocalEcosystemTip(name) {
     const n = String(name || '').toLowerCase();
-    // Simple keyword-based tips
     if (n.includes('acuario') || n.includes('acuário') || n.includes('aquario')) {
         if (n.includes('amazon')) {
             return 'Mantén agua blanda y ligeramente ácida (pH 6.0-7.0), temperatura 24–28°C y realiza cambios parciales de agua semanales.';
@@ -73,6 +71,6 @@ function generateLocalEcosystemTip(name) {
     if (n.includes('oceano') || n.includes('mar') || n.includes('marino')) {
         return 'Controla salinidad, temperatura y calidad del agua; usa equipo específico para acuarios marinos y realiza cambios parciales regulares.';
     }
-    // Generic tip
+    // Genérico tip
     return 'Mantén parámetros estables (temperatura, pH, calidad del agua), evita sobrepoblación y realiza mantenimiento regular.';
 }

@@ -74,12 +74,11 @@ export const agregarEcosistema = async (req, res) => {
       imagenUrl: body.imagenUrl || null,
     };
     const ecosistema = await crearEcosistemaService(ecosistemaGuardar);
-    // Attempt to generate a short AI tip for this ecosystem name. If it fails, still return success.
+    // Incluir un consejo generado por IA sobre el cuidado del ecosistema
     let aiTip = null;
     try {
       aiTip = await generateEcosystemTip(ecosistema.nombre || ecosistemaGuardar.nombre);
     } catch (err) {
-      // log and continue
       console.error('AI tip generation failed:', err?.toString());
     }
 

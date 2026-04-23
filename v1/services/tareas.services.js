@@ -14,16 +14,3 @@ export const crearTareaService = async (tareaGuardar) => {
   return tarea;
 };
 
-export const actualizarTareaService = async (id, tareaActualizar) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  }
-  return await Tarea.findByIdAndUpdate(id, tareaActualizar, { new: true });
-};
-
-export const eliminarTareaService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  }
-  return await Tarea.findByIdAndDelete(id);
-};
