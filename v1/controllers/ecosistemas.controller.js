@@ -6,6 +6,8 @@ import {
   eliminarEcosistemaService,
 } from "../services/ecosistemas.services.js";
 import { generateEcosystemTip } from "./ai.controllers.js";
+import cloudinary from "../config/cloudinary.js";
+import uploadBufferToCloudinary from "../utils/cloudinary.util.js";
 
 export const obtenerEcosistemas = async (req, res) => {
   try {
@@ -73,6 +75,17 @@ export const agregarEcosistema = async (req, res) => {
       categoriaId: body.categoriaId,
       imagenUrl: body.imagenUrl || null,
     };
+    // Si llega un archivo, subirlo a Cloudinary y usar la URL
+    if (req.file && req.file.buffer) {
+      try {
+        const uploadResult = await uploadBufferToCloudinary(cloudinary, req.file.buffer, { folder: "ecosistemas" });
+        if (uploadResult && uploadResult.secure_url) {
+          ecosistemaGuardar.imagenUrl = uploadResult.secure_url;
+        }
+      } catch (err) {
+        console.error("Error subiendo imagen a Cloudinary:", err?.toString());
+      }
+    }
     const ecosistema = await crearEcosistemaService(ecosistemaGuardar);
     // Incluir un consejo generado por IA sobre el cuidado del ecosistema
     let aiTip = null;
