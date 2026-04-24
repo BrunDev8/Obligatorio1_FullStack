@@ -6,7 +6,7 @@ import {
 export const cambiarPlan = async (req, res) => {
   try {
     const userId = req.decoded.id;
-    const { plan } = req.validatedBody;
+    const { plan } = req.validatedBody || req.body || {};
 
     if (!plan) {
       return res.status(400).json({ success: false, message: "Campo 'plan' requerido" });

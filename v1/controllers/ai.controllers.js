@@ -27,7 +27,9 @@ async function callGemini(text) {
 
 export const useGemini25Flash = async (req, res) => {
     try {
-        const text = req.body.prompt;
+        const body = req.validatedBody || req.body || {};
+        const text = (body.prompt || '').toString().trim();
+        if (!text) return res.status(400).json({ message: 'El campo "prompt" es obligatorio' });
         const { final, data } = await callGemini(text);
         res.json({ message: 'Respuesta del modelo Gemini 2.5 Flash', final, data });
     } catch (error) {
