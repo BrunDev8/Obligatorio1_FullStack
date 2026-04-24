@@ -35,7 +35,7 @@ export const searchSpeciesByName = async (name) => {
 
       const shouldRetry = attempts < MAX_ATTEMPTS && (isTimeout || isNetworkError || isServerError);
 
-      console.error('GBIF request failed', { attempt: attempts, message: err?.message });
+      console.error('Solicitud a GBIF fallida', { intento: attempts, mensaje: err?.message });
 
       if (!shouldRetry) {
         return [];

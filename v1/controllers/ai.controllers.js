@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const getModels = (req, res) => {
-    res.json({ message: 'List of AI models' });
+    res.json({ message: 'Lista de modelos de IA' });
 };
 
 const API_KEY = process.env.GEMINI_25_API_KEY;
@@ -29,7 +29,7 @@ export const useGemini25Flash = async (req, res) => {
     try {
         const text = req.body.prompt;
         const { final, data } = await callGemini(text);
-        res.json({ message: 'Gemini 2.5 Flash response', final, data });
+        res.json({ message: 'Respuesta del modelo Gemini 2.5 Flash', final, data });
     } catch (error) {
         console.error(error?.toString());
         res.status(500).json({ message: 'Ocurrió un error al usar el modelo Gemini 2.5 Flash' });
@@ -48,7 +48,7 @@ export async function generateEcosystemTip(ecosystemName) {
         try {
             return generateLocalEcosystemTip(ecosystemName);
         } catch (localErr) {
-            console.error('Error generating local tip fallback:', localErr?.toString());
+                console.error('Error generando fallback local del tip:', localErr?.toString());
             return null;
         }
     }
