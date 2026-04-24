@@ -8,6 +8,7 @@ import categoriasRouter from "./routes/categorias.routes.js";
 import { authenticateMiddleware } from "./middlewares/authenticate.middleware.js";
 import aiRouter from "./routes/ai.routes.js";
 import uploadsRouter from "./routes/uploads.routes.js";
+import plantsRouter from "./routes/plants.routes.js";
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.use("/registro-parametros", authenticateMiddleware, registroParametroRout
 router.use("/tareas", authenticateMiddleware, tareasRouter);
 router.use("/categorias", authenticateMiddleware, categoriasRouter);
 router.use("/ai", aiRouter);
+router.use("/plants", plantsRouter);
 router.use("/uploads", uploadsRouter);
 
 export default router;
