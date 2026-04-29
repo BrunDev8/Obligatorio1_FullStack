@@ -11,10 +11,8 @@ export const subirImagen = async (req, res) => {
             return res.status(400).json({ error: "No se subió ningún archivo" });
         }
 
-        // Permitir especificar carpeta vía req.body.folder, por defecto 'uploads'
         const folder = req.body?.folder || "uploads";
 
-        // Sube el buffer a Cloudinary usando la utilidad promisificada
         const result = await uploadBufferToCloudinary(cloudinary, req.file.buffer, {
             resource_type: "auto",
             folder,
