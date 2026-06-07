@@ -11,12 +11,14 @@ import uploadBufferToCloudinary from "../utils/cloudinary.util.js";
 
 export const obtenerEcosistemas = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const page = req.query.page;
     const limit = req.query.limit;
     const result = await obtenerEcosistemasService({
       categoriaTipo: req.query.categoriaTipo,
       page,
       limit,
+      usuarioId,
     });
 
     const { data, total, page: pageNum, limit: limitNum, totalPages } = result;
@@ -42,10 +44,11 @@ export const obtenerEcosistemas = async (req, res) => {
 
 export const buscarEcosistemasPorCategoria = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const categoriaId = req.params.categoriaId;
     const page = req.query.page;
     const limit = req.query.limit;
-    const result = await buscarEcosistemasPorCategoriaService(categoriaId, { page, limit });
+    const result = await buscarEcosistemasPorCategoriaService(categoriaId, { page, limit, usuarioId });
     const { data, total, page: pageNum, limit: limitNum, totalPages } = result;
 
     if (Array.isArray(data) && data.length === 0) {
@@ -66,12 +69,12 @@ export const buscarEcosistemasPorCategoria = async (req, res) => {
 
 export const agregarEcosistema = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const body = req.validatedBody || req.body;
     const ecosistemaGuardar = {
       nombre: body.nombre,
       descripcion: body.descripcion || "",
       tamano: body.tamano,
-      usuarioId: body.usuarioId || req.decoded.id,
       categoriaId: body.categoriaId,
       imagenUrl: body.imagenUrl || null,
     };
@@ -86,7 +89,7 @@ export const agregarEcosistema = async (req, res) => {
         console.error("Error subiendo imagen a Cloudinary:", err?.toString());
       }
     }
-    const ecosistema = await crearEcosistemaService(ecosistemaGuardar);
+    const ecosistema = await crearEcosistemaService(ecosistemaGuardar, usuarioId);
     // Incluir un consejo generado por IA sobre el cuidado del ecosistema
     let aiTip = null;
     try {
@@ -111,9 +114,10 @@ export const agregarEcosistema = async (req, res) => {
 
 export const actualizarEcosistema = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const id = req.params.id;
     const body = req.validatedBody || req.body;
-    const eco = await actualizarEcosistemaService(id, { ...body });
+    const eco = await actualizarEcosistemaService(id, { ...body }, usuarioId);
     if (!eco)
       return res
         .status(404)
@@ -132,8 +136,9 @@ export const actualizarEcosistema = async (req, res) => {
 
 export const eliminarEcosistema = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const id = req.params.id;
-    const eliminado = await eliminarEcosistemaService(id);
+    const eliminado = await eliminarEcosistemaService(id, usuarioId);
     if (!eliminado)
       return res
         .status(404)

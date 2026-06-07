@@ -5,9 +5,10 @@ import {
 
 export const obtenerRegistroParametrosPorEcosistema = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const ecosistemaId = req.params.ecosistemaId;
     const registroParametros =
-      await obtenerRegistroParametrosPorEcosistemaService(ecosistemaId);
+      await obtenerRegistroParametrosPorEcosistemaService(ecosistemaId, usuarioId);
     if (Array.isArray(registroParametros) && registroParametros.length === 0) {
       return res.json({ success: true, message: "No se encontraron registros de parámetros para el ecosistema", data: registroParametros });
     }
@@ -24,6 +25,7 @@ export const obtenerRegistroParametrosPorEcosistema = async (req, res) => {
 
 export const agregarRegistroParametro = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const body = req.validatedBody || req.body;
     const registroParametroGuardar = {
       ecosistemaId: body.ecosistemaId,
@@ -38,6 +40,7 @@ export const agregarRegistroParametro = async (req, res) => {
     };
     const registroParametro = await crearRegistroParametroService(
       registroParametroGuardar,
+      usuarioId,
     );
     if (!registroParametro) {
       return res.status(500).json({ success: false, message: "No se pudo crear el registro de parámetros" });

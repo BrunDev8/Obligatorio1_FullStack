@@ -5,7 +5,7 @@ import {
 
 export const cambiarPlan = async (req, res) => {
   try {
-    const userId = req.decoded.id;
+    const userId = req.user?.id || req.decoded?.id;
     const { plan } = req.validatedBody || req.body || {};
 
     if (!plan) {

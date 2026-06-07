@@ -2,6 +2,7 @@ import Ecosistema from "../models/ecosistema.model.js";
 import Usuario from "../models/usuario.model.js";
 import Categoria from "../models/categoria.model.js";
 import { isValidObjectId } from "mongoose";
+import { obtenerEcosistemaPropioPorId } from "./ownership.service.js";
 
 const crearErrorHttp = (message, statusCode) => {
   const error = new Error(message);
@@ -29,11 +30,15 @@ const validarCategoriaExistente = async (categoriaId) => {
 const poblarCategoria = (consulta) =>
   consulta.populate({ path: "categoriaId", select: categoriaProyeccion });
 
-export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit = 10 } = {}) => {
+export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit = 10, usuarioId } = {}) => {
   const tipoNormalizado = typeof categoriaTipo === "string" ? categoriaTipo.trim() : "";
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
   const skip = (pageNum - 1) * limitNum;
+
+  if (!isValidObjectId(usuarioId)) {
+    throw crearErrorHttp("ID de usuario inválido", 400);
+  }
 
   if (tipoNormalizado) {
     const categorias = await Categoria.find({
@@ -47,46 +52,50 @@ export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit
     }
 
     const categoriaIds = categorias.map((categoria) => categoria._id);
-    const filter = { categoriaId: { $in: categoriaIds } };
+    const filter = { usuarioId, categoriaId: { $in: categoriaIds } };
     const total = await Ecosistema.countDocuments(filter);
     const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
     const totalPages = Math.ceil(total / limitNum);
     return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
   }
 
-  const total = await Ecosistema.countDocuments();
-  const docs = await poblarCategoria(Ecosistema.find().skip(skip).limit(limitNum));
-  const totalPages = Math.ceil(total / limitNum);
-  return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
-};
-
-export const buscarEcosistemasPorCategoriaService = async (categoriaId, { page = 1, limit = 10 } = {}) => {
-  await validarCategoriaExistente(categoriaId);
-  const pageNum = Math.max(1, parseInt(page, 10) || 1);
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
-  const skip = (pageNum - 1) * limitNum;
-
-  const filter = { categoriaId };
+  const filter = { usuarioId };
   const total = await Ecosistema.countDocuments(filter);
   const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
   const totalPages = Math.ceil(total / limitNum);
   return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
 };
 
-export const crearEcosistemaService = async (ecosistemaGuardar) => {
-  // Validar usuario
-  if (!ecosistemaGuardar.usuarioId || !isValidObjectId(ecosistemaGuardar.usuarioId)) {
+export const buscarEcosistemasPorCategoriaService = async (categoriaId, { page = 1, limit = 10, usuarioId } = {}) => {
+  await validarCategoriaExistente(categoriaId);
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
+  const skip = (pageNum - 1) * limitNum;
+
+  if (!isValidObjectId(usuarioId)) {
     throw crearErrorHttp("ID de usuario inválido", 400);
   }
 
-  const usuario = await Usuario.findById(ecosistemaGuardar.usuarioId).select("plan").lean();
+  const filter = { categoriaId, usuarioId };
+  const total = await Ecosistema.countDocuments(filter);
+  const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
+  const totalPages = Math.ceil(total / limitNum);
+  return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
+};
+
+export const crearEcosistemaService = async (ecosistemaGuardar, usuarioIdAutenticado) => {
+  if (!isValidObjectId(usuarioIdAutenticado)) {
+    throw crearErrorHttp("ID de usuario inválido", 400);
+  }
+
+  const usuario = await Usuario.findById(usuarioIdAutenticado).select("plan").lean();
   if (!usuario) {
     throw crearErrorHttp("Usuario no encontrado", 404);
   }
 
   // Si no es premium, aplicar límite de 4 ecosistemas
   if (usuario.plan !== "premium") {
-    const count = await Ecosistema.countDocuments({ usuarioId: ecosistemaGuardar.usuarioId });
+    const count = await Ecosistema.countDocuments({ usuarioId: usuarioIdAutenticado });
     if (count >= 4) {
       throw crearErrorHttp("Límite de ecosistemas alcanzado para usuarios estándar", 403);
     }
@@ -94,30 +103,31 @@ export const crearEcosistemaService = async (ecosistemaGuardar) => {
 
   await validarCategoriaExistente(ecosistemaGuardar.categoriaId);
 
-  const ecosistema = new Ecosistema(ecosistemaGuardar);
+  const ecosistema = new Ecosistema({
+    ...ecosistemaGuardar,
+    usuarioId: usuarioIdAutenticado,
+  });
   await ecosistema.save();
   return poblarCategoria(Ecosistema.findById(ecosistema._id));
 };
 
-export const actualizarEcosistemaService = async (id, ecosistemaActualizar) => {
-  if (!isValidObjectId(id)) {
-    throw crearErrorHttp("ID de ecosistema inválido", 400);
-  }
+export const actualizarEcosistemaService = async (id, ecosistemaActualizar, usuarioIdAutenticado) => {
+  await obtenerEcosistemaPropioPorId(id, usuarioIdAutenticado);
 
-  if (ecosistemaActualizar.categoriaId !== undefined) {
-    await validarCategoriaExistente(ecosistemaActualizar.categoriaId);
+  const { usuarioId, ...actualizacion } = ecosistemaActualizar;
+
+  if (actualizacion.categoriaId !== undefined) {
+    await validarCategoriaExistente(actualizacion.categoriaId);
   }
   return poblarCategoria(
-    Ecosistema.findByIdAndUpdate(id, ecosistemaActualizar, {
+    Ecosistema.findByIdAndUpdate(id, actualizacion, {
       new: true,
       runValidators: true,
     }),
   );
 };
 
-export const eliminarEcosistemaService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw crearErrorHttp("ID de ecosistema inválido", 400);
-  }
+export const eliminarEcosistemaService = async (id, usuarioIdAutenticado) => {
+  await obtenerEcosistemaPropioPorId(id, usuarioIdAutenticado);
   return Ecosistema.findByIdAndDelete(id);
 };

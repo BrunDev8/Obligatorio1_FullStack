@@ -5,8 +5,9 @@ import {
 
 export const obtenerTareasPorEcosistema = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const ecosistemaId = req.params.ecosistemaId;
-    const tareas = await obtenerTareasPorEcosistemaService(ecosistemaId);
+    const tareas = await obtenerTareasPorEcosistemaService(ecosistemaId, usuarioId);
     if (Array.isArray(tareas) && tareas.length === 0) {
       return res.json({ success: true, message: "No se encontraron tareas para el ecosistema", data: tareas });
     }
@@ -25,6 +26,7 @@ export const obtenerTareasPorEcosistema = async (req, res) => {
 
 export const agregarTarea = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const body = req.validatedBody || req.body;
     const tareaGuardar = {
       ecosistemaId: body.ecosistemaId,
@@ -40,7 +42,7 @@ export const agregarTarea = async (req, res) => {
         : null,
       completada: !!body.completada,
     };
-    const tarea = await crearTareaService(tareaGuardar);
+    const tarea = await crearTareaService(tareaGuardar, usuarioId);
     if (!tarea) {
       return res.status(500).json({ success: false, message: "No se pudo crear la tarea" });
     }
