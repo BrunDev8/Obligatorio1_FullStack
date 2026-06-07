@@ -12,6 +12,7 @@ export const login = async (req, res) => {
     res.json({
       message: "Usuario ingresado correctamente",
       token: result.token,
+      user: result.usuario,
     });
   } catch (err) {
     res
