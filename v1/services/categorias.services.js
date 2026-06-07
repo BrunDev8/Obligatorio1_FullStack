@@ -1,28 +1,47 @@
 import { isValidObjectId } from "mongoose";
 import Categoria from "../models/categoria.model.js";
+import { obtenerCategoriaPropiaPorId } from "./ownership.service.js";
 
-export const obtenerCategoriasService = async () => {
-  return await Categoria.find();
+const crearErrorHttp = (message, statusCode) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  error.status = statusCode;
+  return error;
 };
 
-export const crearCategoriaService = async (categoriaGuardar) => {
-  const categoria = new Categoria(categoriaGuardar);
+export const obtenerCategoriasService = async (usuarioId) => {
+  if (!isValidObjectId(usuarioId)) {
+    throw crearErrorHttp("ID de usuario inválido", 400);
+  }
+
+  return await Categoria.find({ usuarioId });
+};
+
+export const crearCategoriaService = async (categoriaGuardar, usuarioId) => {
+  if (!isValidObjectId(usuarioId)) {
+    throw crearErrorHttp("ID de usuario inválido", 400);
+  }
+
+  const categoria = new Categoria({
+    ...categoriaGuardar,
+    usuarioId,
+  });
   await categoria.save();
   return categoria;
 };
 
-export const actualizarCategoriaService = async (id, categoriaActualizar) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  }
-  return await Categoria.findByIdAndUpdate(id, categoriaActualizar, {
+export const actualizarCategoriaService = async (id, categoriaActualizar, usuarioId) => {
+  await obtenerCategoriaPropiaPorId(id, usuarioId);
+
+  const { usuarioId: usuarioIdCategoria, ...actualizacion } = categoriaActualizar;
+
+  return await Categoria.findOneAndUpdate({ _id: id, usuarioId }, actualizacion, {
     new: true,
+    runValidators: true,
   });
 };
 
-export const eliminarCategoriaService = async (id) => {
-  if (!isValidObjectId(id)) {
-    throw new Error("ID inválido");
-  }
-  return await Categoria.findByIdAndDelete(id);
+export const eliminarCategoriaService = async (id, usuarioId) => {
+  await obtenerCategoriaPropiaPorId(id, usuarioId);
+  return await Categoria.findOneAndDelete({ _id: id, usuarioId });
 };

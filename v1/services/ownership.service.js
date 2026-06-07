@@ -1,4 +1,5 @@
 import { isValidObjectId } from "mongoose";
+import Categoria from "../models/categoria.model.js";
 import Ecosistema from "../models/ecosistema.model.js";
 
 const crearErrorHttp = (message, statusCode) => {
@@ -30,4 +31,28 @@ export const obtenerEcosistemaPropioPorId = async (ecosistemaId, usuarioId) => {
   }
 
   return ecosistema;
+};
+
+export const obtenerCategoriaPropiaPorId = async (categoriaId, usuarioId) => {
+  if (!isValidObjectId(categoriaId)) {
+    throw crearErrorHttp("ID de categoría inválido", 400);
+  }
+
+  if (!isValidObjectId(usuarioId)) {
+    throw crearErrorHttp("ID de usuario inválido", 400);
+  }
+
+  const categoria = await Categoria.findById(categoriaId)
+    .select("_id usuarioId")
+    .lean();
+
+  if (!categoria) {
+    throw crearErrorHttp("Categoría no encontrada", 404);
+  }
+
+  if (String(categoria.usuarioId) !== String(usuarioId)) {
+    throw crearErrorHttp("No tienes permiso para acceder a esta categoría", 403);
+  }
+
+  return categoria;
 };

@@ -12,7 +12,15 @@ export const registrarUsuarioService = async (usuario) => {
       expiresIn: "1d",
     },
   );
-  return { token };
+  return {
+    token,
+    usuario: {
+      _id: nuevoUsuario._id,
+      username: nuevoUsuario.username,
+      email: nuevoUsuario.email,
+      plan: nuevoUsuario.plan,
+    },
+  };
 };
 
 export const loginService = async (email, password) => {
@@ -22,7 +30,7 @@ export const loginService = async (email, password) => {
 
   if (!usuario) return { message: "Usuario no encontrado" };
   const isMatch = bcrypt.compareSync(password, usuario.password);
-  if (!isMatch) return { message: "Contraseña incorrecta" };
+  if (!isMatch) return { message: "Usuario o contraseña incorrectos" };
   const token = jwt.sign(
     { id: usuario._id, plan: usuario.plan },
     process.env.SECRET_KEY,

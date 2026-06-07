@@ -7,7 +7,8 @@ import {
 
 export const obtenerCategorias = async (req, res) => {
   try {
-    const categorias = await obtenerCategoriasService();
+    const usuarioId = req.user?.id || req.decoded?.id;
+    const categorias = await obtenerCategoriasService(usuarioId);
     if (Array.isArray(categorias) && categorias.length === 0) {
       return res.json({ success: true, message: "No se encontraron categorias", data: categorias });
     }
@@ -26,13 +27,14 @@ export const obtenerCategorias = async (req, res) => {
 
 export const agregarCategoria = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const body = req.validatedBody || req.body;
     const categoriaGuardar = {
       nombre: body.nombre,
       tipo: body.tipo,
       descripcion: body.descripcion || "",
     };
-    const categoria = await crearCategoriaService(categoriaGuardar);
+    const categoria = await crearCategoriaService(categoriaGuardar, usuarioId);
     if (!categoria) {
       return res.status(500).json({ success: false, message: "No se pudo crear la categoria" });
     }
@@ -50,13 +52,14 @@ export const agregarCategoria = async (req, res) => {
 
 export const editarCategoria = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const id = req.params.id;
     const body = req.validatedBody || req.body;
     const categoria = await actualizarCategoriaService(id, {
       nombre: body.nombre,
       tipo: body.tipo,
       descripcion: body.descripcion,
-    });
+    }, usuarioId);
     if (!categoria)
       return res
         .status(404)
@@ -79,8 +82,9 @@ export const editarCategoria = async (req, res) => {
 
 export const eliminarCategoria = async (req, res) => {
   try {
+    const usuarioId = req.user?.id || req.decoded?.id;
     const id = req.params.id;
-    const categoria = await eliminarCategoriaService(id);
+    const categoria = await eliminarCategoriaService(id, usuarioId);
     if (!categoria)
       return res
         .status(404)

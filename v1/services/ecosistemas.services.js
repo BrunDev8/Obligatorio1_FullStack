@@ -2,7 +2,7 @@ import Ecosistema from "../models/ecosistema.model.js";
 import Usuario from "../models/usuario.model.js";
 import Categoria from "../models/categoria.model.js";
 import { isValidObjectId } from "mongoose";
-import { obtenerEcosistemaPropioPorId } from "./ownership.service.js";
+import { obtenerEcosistemaPropioPorId, obtenerCategoriaPropiaPorId } from "./ownership.service.js";
 
 const crearErrorHttp = (message, statusCode) => {
   const error = new Error(message);
@@ -42,6 +42,7 @@ export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit
 
   if (tipoNormalizado) {
     const categorias = await Categoria.find({
+      usuarioId,
       tipo: new RegExp(`^${escaparExpresionRegular(tipoNormalizado)}$`, "i"),
     })
       .select("_id")
@@ -67,7 +68,7 @@ export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit
 };
 
 export const buscarEcosistemasPorCategoriaService = async (categoriaId, { page = 1, limit = 10, usuarioId } = {}) => {
-  await validarCategoriaExistente(categoriaId);
+  await obtenerCategoriaPropiaPorId(categoriaId, usuarioId);
   const pageNum = Math.max(1, parseInt(page, 10) || 1);
   const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
   const skip = (pageNum - 1) * limitNum;
@@ -101,7 +102,7 @@ export const crearEcosistemaService = async (ecosistemaGuardar, usuarioIdAutenti
     }
   }
 
-  await validarCategoriaExistente(ecosistemaGuardar.categoriaId);
+  await obtenerCategoriaPropiaPorId(ecosistemaGuardar.categoriaId, usuarioIdAutenticado);
 
   const ecosistema = new Ecosistema({
     ...ecosistemaGuardar,
@@ -117,7 +118,7 @@ export const actualizarEcosistemaService = async (id, ecosistemaActualizar, usua
   const { usuarioId, ...actualizacion } = ecosistemaActualizar;
 
   if (actualizacion.categoriaId !== undefined) {
-    await validarCategoriaExistente(actualizacion.categoriaId);
+    await obtenerCategoriaPropiaPorId(actualizacion.categoriaId, usuarioIdAutenticado);
   }
   return poblarCategoria(
     Ecosistema.findByIdAndUpdate(id, actualizacion, {

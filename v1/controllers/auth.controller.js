@@ -28,7 +28,11 @@ export const registrarUsuario = async (req, res) => {
     if (!result || !result.token) {
       return res.status(500).json({ success: false, message: "No se pudo registrar el usuario" });
     }
-    res.status(201).json({ message: "Usuario registrado correctamente" });
+    res.status(201).json({
+      message: "Usuario registrado correctamente",
+      token: result.token,
+      user: result.usuario,
+    });
   } catch (err) {
     res
       .status(500)

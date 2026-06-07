@@ -14,6 +14,11 @@ const categoriaSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    usuarioId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Usuario",
+      required: true,
+    },
   },
   {
     timestamps: {
