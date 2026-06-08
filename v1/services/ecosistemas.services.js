@@ -1,6 +1,8 @@
 import Ecosistema from "../models/ecosistema.model.js";
 import Usuario from "../models/usuario.model.js";
 import Categoria from "../models/categoria.model.js";
+import Tarea from "../models/tarea.model.js";
+import RegistroParametro from "../models/registroParametro.model.js";
 import { isValidObjectId } from "mongoose";
 import { obtenerEcosistemaPropioPorId, obtenerCategoriaPropiaPorId } from "./ownership.service.js";
 
@@ -130,5 +132,11 @@ export const actualizarEcosistemaService = async (id, ecosistemaActualizar, usua
 
 export const eliminarEcosistemaService = async (id, usuarioIdAutenticado) => {
   await obtenerEcosistemaPropioPorId(id, usuarioIdAutenticado);
+
+  await Promise.all([
+    Tarea.deleteMany({ ecosistemaId: id }),
+    RegistroParametro.deleteMany({ ecosistemaId: id }),
+  ]);
+
   return Ecosistema.findByIdAndDelete(id);
 };

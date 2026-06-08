@@ -96,7 +96,7 @@ export const eliminarCategoria = async (req, res) => {
     });
   } catch (err) {
     res
-      .status(500)
+      .status(err.statusCode || 500)
       .json({
         success: false,
         message: "Error al eliminar categoria",

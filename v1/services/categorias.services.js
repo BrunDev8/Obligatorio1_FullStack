@@ -1,5 +1,6 @@
 import { isValidObjectId } from "mongoose";
 import Categoria from "../models/categoria.model.js";
+import Ecosistema from "../models/ecosistema.model.js";
 import { obtenerCategoriaPropiaPorId } from "./ownership.service.js";
 
 const crearErrorHttp = (message, statusCode) => {
@@ -43,5 +44,18 @@ export const actualizarCategoriaService = async (id, categoriaActualizar, usuari
 
 export const eliminarCategoriaService = async (id, usuarioId) => {
   await obtenerCategoriaPropiaPorId(id, usuarioId);
+
+  const ecosistemasRelacionados = await Ecosistema.countDocuments({
+    categoriaId: id,
+    usuarioId,
+  });
+
+  if (ecosistemasRelacionados > 0) {
+    throw crearErrorHttp(
+      "No se puede eliminar la categoría porque tiene ecosistemas asociados",
+      400,
+    );
+  }
+
   return await Categoria.findOneAndDelete({ _id: id, usuarioId });
 };
