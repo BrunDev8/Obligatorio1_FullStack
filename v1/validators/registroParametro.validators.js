@@ -17,6 +17,16 @@ export const crearRegistroParametroSchema = Joi.object({
     "any.required": "El pH es obligatorio",
   }),
 
+  kh: Joi.number().min(0).optional().messages({
+    "number.base": "El KH debe ser un número",
+    "number.min": "El KH no puede ser menor que 0",
+  }),
+
+  tds: Joi.number().min(0).optional().messages({
+    "number.base": "El TDS debe ser un número",
+    "number.min": "El TDS no puede ser menor que 0",
+  }),
+
   salinidad: Joi.number().min(1).max(1.04).optional().messages({
     "number.base": "La salinidad debe ser un número",
     "number.min": "La salinidad no es válida",

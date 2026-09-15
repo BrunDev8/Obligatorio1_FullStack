@@ -24,7 +24,7 @@ export const buscarEcosistemasPorCategoriaService = async (categoriaId) => {
   return poblarCategoria(Ecosistema.find({ categoriaId }).sort({ createdAt: -1 }));
 };
 export const crearEcosistemaService = async (datos) => {
-  await comprobarCategoria(datos.categoriaId);
+  if (datos.categoriaId !== undefined) await comprobarCategoria(datos.categoriaId);
   const ecosistema = await Ecosistema.create(datos);
   return poblarCategoria(Ecosistema.findById(ecosistema._id));
 };

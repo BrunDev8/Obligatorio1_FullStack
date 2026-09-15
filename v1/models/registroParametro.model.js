@@ -19,6 +19,14 @@ const registroParametroSchema = new mongoose.Schema(
       min: [0, "El pH no puede ser menor que 0."],
       max: [14, "El pH no puede ser mayor que 14."],
     },
+    kh: {
+      type: Number,
+      min: [0, "El KH no puede ser menor que 0."],
+    },
+    tds: {
+      type: Number,
+      min: [0, "El TDS no puede ser menor que 0."],
+    },
     salinidad: {
       type: Number,
       required: [true, "La salinidad es obligatoria."],

@@ -15,7 +15,6 @@ const ecosistemaSchema = new mongoose.Schema(
     categoriaId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Categoria",
-      required: true,
     },
     imagenUrl: { type: String },
   },

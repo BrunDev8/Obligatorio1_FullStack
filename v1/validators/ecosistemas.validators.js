@@ -20,10 +20,9 @@ export const crearEcosistemaSchema = aliasTamano(Joi.object({
     "number.positive": "El tamaño debe ser un valor positivo",
   }).optional(),
 
-  categoriaId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
+  categoriaId: Joi.string().empty("").pattern(/^[0-9a-fA-F]{24}$/).optional().messages({
     "string.base": "La categoría debe ser un texto (ObjectId)",
     "string.pattern.base": "La categoriaId debe ser un ObjectId válido",
-    "any.required": "La categoriaId es obligatoria",
   }),
 
   imagenUrl: Joi.string().allow("").uri().optional().messages({
