@@ -1,142 +1,39 @@
-import Ecosistema from "../models/ecosistema.model.js";
-import Usuario from "../models/usuario.model.js";
+import { isValidObjectId } from "mongoose";
 import Categoria from "../models/categoria.model.js";
+import Ecosistema from "../models/ecosistema.model.js";
 import Tarea from "../models/tarea.model.js";
 import RegistroParametro from "../models/registroParametro.model.js";
-import { isValidObjectId } from "mongoose";
-import { obtenerEcosistemaPropioPorId, obtenerCategoriaPropiaPorId } from "./ownership.service.js";
 
-const crearErrorHttp = (message, statusCode) => {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  error.status = statusCode;
-  return error;
+const errorHttp = (message, statusCode) => Object.assign(new Error(message), { statusCode });
+const comprobarCategoria = async (categoriaId) => {
+  if (!isValidObjectId(categoriaId)) throw errorHttp("ID de categoría inválido", 400);
+  if (!await Categoria.exists({ _id: categoriaId })) throw errorHttp("Categoría no encontrada", 404);
 };
+const poblarCategoria = (consulta) => consulta.populate("categoriaId");
 
-const categoriaProyeccion = "nombre tipo descripcion";
-
-const escaparExpresionRegular = (valor) =>
-  valor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const validarCategoriaExistente = async (categoriaId) => {
-  if (!isValidObjectId(categoriaId)) {
-    throw crearErrorHttp("ID de categoría inválido", 400);
+export const obtenerEcosistemasService = async ({ categoriaTipo } = {}) => {
+  const filtro = {};
+  if (categoriaTipo) {
+    const categorias = await Categoria.find({ tipo: categoriaTipo }).select("_id");
+    filtro.categoriaId = { $in: categorias.map((categoria) => categoria._id) };
   }
-
-  const categoria = await Categoria.findById(categoriaId).select("_id").lean();
-  if (!categoria) {
-    throw crearErrorHttp("Categoría no encontrada", 404);
-  }
+  return poblarCategoria(Ecosistema.find(filtro).sort({ createdAt: -1 }));
 };
-
-const poblarCategoria = (consulta) =>
-  consulta.populate({ path: "categoriaId", select: categoriaProyeccion });
-
-export const obtenerEcosistemasService = async ({ categoriaTipo, page = 1, limit = 10, usuarioId } = {}) => {
-  const tipoNormalizado = typeof categoriaTipo === "string" ? categoriaTipo.trim() : "";
-  const pageNum = Math.max(1, parseInt(page, 10) || 1);
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
-  const skip = (pageNum - 1) * limitNum;
-
-  if (!isValidObjectId(usuarioId)) {
-    throw crearErrorHttp("ID de usuario inválido", 400);
-  }
-
-  if (tipoNormalizado) {
-    const categorias = await Categoria.find({
-      usuarioId,
-      tipo: new RegExp(`^${escaparExpresionRegular(tipoNormalizado)}$`, "i"),
-    })
-      .select("_id")
-      .lean();
-
-    if (categorias.length === 0) {
-      return { data: [], total: 0, page: pageNum, limit: limitNum, totalPages: 0 };
-    }
-
-    const categoriaIds = categorias.map((categoria) => categoria._id);
-    const filter = { usuarioId, categoriaId: { $in: categoriaIds } };
-    const total = await Ecosistema.countDocuments(filter);
-    const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
-    const totalPages = Math.ceil(total / limitNum);
-    return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
-  }
-
-  const filter = { usuarioId };
-  const total = await Ecosistema.countDocuments(filter);
-  const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
-  const totalPages = Math.ceil(total / limitNum);
-  return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
+export const buscarEcosistemasPorCategoriaService = async (categoriaId) => {
+  if (!isValidObjectId(categoriaId)) throw errorHttp("ID de categoría inválido", 400);
+  return poblarCategoria(Ecosistema.find({ categoriaId }).sort({ createdAt: -1 }));
 };
-
-export const buscarEcosistemasPorCategoriaService = async (categoriaId, { page = 1, limit = 10, usuarioId } = {}) => {
-  await obtenerCategoriaPropiaPorId(categoriaId, usuarioId);
-  const pageNum = Math.max(1, parseInt(page, 10) || 1);
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
-  const skip = (pageNum - 1) * limitNum;
-
-  if (!isValidObjectId(usuarioId)) {
-    throw crearErrorHttp("ID de usuario inválido", 400);
-  }
-
-  const filter = { categoriaId, usuarioId };
-  const total = await Ecosistema.countDocuments(filter);
-  const docs = await poblarCategoria(Ecosistema.find(filter).skip(skip).limit(limitNum));
-  const totalPages = Math.ceil(total / limitNum);
-  return { data: docs, total, page: pageNum, limit: limitNum, totalPages };
-};
-
-export const crearEcosistemaService = async (ecosistemaGuardar, usuarioIdAutenticado) => {
-  if (!isValidObjectId(usuarioIdAutenticado)) {
-    throw crearErrorHttp("ID de usuario inválido", 400);
-  }
-
-  const usuario = await Usuario.findById(usuarioIdAutenticado).select("plan").lean();
-  if (!usuario) {
-    throw crearErrorHttp("Usuario no encontrado", 404);
-  }
-
-  // Si no es premium, aplicar límite de 4 ecosistemas
-  if (usuario.plan !== "premium") {
-    const count = await Ecosistema.countDocuments({ usuarioId: usuarioIdAutenticado });
-    if (count >= 4) {
-      throw crearErrorHttp("Límite de ecosistemas alcanzado para usuarios estándar", 403);
-    }
-  }
-
-  await obtenerCategoriaPropiaPorId(ecosistemaGuardar.categoriaId, usuarioIdAutenticado);
-
-  const ecosistema = new Ecosistema({
-    ...ecosistemaGuardar,
-    usuarioId: usuarioIdAutenticado,
-  });
-  await ecosistema.save();
+export const crearEcosistemaService = async (datos) => {
+  await comprobarCategoria(datos.categoriaId);
+  const ecosistema = await Ecosistema.create(datos);
   return poblarCategoria(Ecosistema.findById(ecosistema._id));
 };
-
-export const actualizarEcosistemaService = async (id, ecosistemaActualizar, usuarioIdAutenticado) => {
-  await obtenerEcosistemaPropioPorId(id, usuarioIdAutenticado);
-
-  const { usuarioId, ...actualizacion } = ecosistemaActualizar;
-
-  if (actualizacion.categoriaId !== undefined) {
-    await obtenerCategoriaPropiaPorId(actualizacion.categoriaId, usuarioIdAutenticado);
-  }
-  return poblarCategoria(
-    Ecosistema.findByIdAndUpdate(id, actualizacion, {
-      new: true,
-      runValidators: true,
-    }),
-  );
+export const actualizarEcosistemaService = async (id, datos) => {
+  if (datos.categoriaId !== undefined) await comprobarCategoria(datos.categoriaId);
+  return poblarCategoria(Ecosistema.findByIdAndUpdate(id, datos, { new: true, runValidators: true }));
 };
-
-export const eliminarEcosistemaService = async (id, usuarioIdAutenticado) => {
-  await obtenerEcosistemaPropioPorId(id, usuarioIdAutenticado);
-
-  await Promise.all([
-    Tarea.deleteMany({ ecosistemaId: id }),
-    RegistroParametro.deleteMany({ ecosistemaId: id }),
-  ]);
-
-  return Ecosistema.findByIdAndDelete(id);
+export const eliminarEcosistemaService = async (id) => {
+  const eliminado = await Ecosistema.findByIdAndDelete(id);
+  if (eliminado) await Promise.all([Tarea.deleteMany({ ecosistemaId: id }), RegistroParametro.deleteMany({ ecosistemaId: id })]);
+  return eliminado;
 };

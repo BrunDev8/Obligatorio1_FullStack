@@ -14,18 +14,8 @@ const categoriaSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    usuarioId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Usuario",
-      required: true,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "creadoEn",
-      updatedAt: "actualizadoEn",
-    },
-  },
+  { timestamps: true },
 );
 
 export default mongoose.model("Categoria", categoriaSchema);

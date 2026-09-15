@@ -17,10 +17,12 @@ export const crearRegistroParametroSchema = Joi.object({
     "any.required": "El pH es obligatorio",
   }),
 
-  humedad: Joi.number().required().messages({
-    "number.base": "La humedad debe ser un número",
-    "any.required": "La humedad es obligatoria",
+  salinidad: Joi.number().min(1).max(1.04).optional().messages({
+    "number.base": "La salinidad debe ser un número",
+    "number.min": "La salinidad no es válida",
+    "number.max": "La salinidad no es válida",
   }),
+  humedad: Joi.number().min(1).max(1.04).optional(),
 
   nitratos: Joi.number().required().messages({
     "number.base": "Los nitratos deben ser un número",
@@ -32,10 +34,14 @@ export const crearRegistroParametroSchema = Joi.object({
     "string.max": "Las notas no pueden tener más de {#limit} caracteres",
   }).optional(),
 
-  fechaRegistro: Joi.date().optional().messages({
-    "date.base": "La fecha de registro debe ser una fecha válida",
-  }),
-});
+  fecha: Joi.string().optional(),
+  hora: Joi.string().optional(),
+}).custom((value, helpers) => {
+  if (value.salinidad === undefined && value.humedad === undefined) {
+    return helpers.error("any.custom");
+  }
+  return value;
+}).messages({ "any.custom": "La salinidad es obligatoria" });
 
 export const crearRegistroSchema = crearRegistroParametroSchema;
 

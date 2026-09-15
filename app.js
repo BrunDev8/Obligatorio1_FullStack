@@ -1,7 +1,6 @@
 
 import "dotenv/config";
 
-
 import express from "express";
 import v1Router from "./v1/v1.routes.js";
 import cors from "cors";
@@ -13,13 +12,17 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3004",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("¡Respuesta desde el servidor a la raiz!");
-});
+app.get("/health", (req, res) => res.json({ ok: true }));
 
 app.use("/v1", v1Router);
 

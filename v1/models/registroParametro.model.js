@@ -19,12 +19,13 @@ const registroParametroSchema = new mongoose.Schema(
       min: [0, "El pH no puede ser menor que 0."],
       max: [14, "El pH no puede ser mayor que 14."],
     },
-    humedad: {
+    salinidad: {
       type: Number,
-      required: [true, "La humedad es obligatoria."],
-      min: [0, "La humedad no puede ser menor que 0."],
-      max: [100, "La humedad no puede ser mayor que 100."],
+      required: [true, "La salinidad es obligatoria."],
+      min: [1, "La salinidad no puede ser menor que 1.000."],
+      max: [1.04, "La salinidad no puede ser mayor que 1.040."],
     },
+    humedad: { type: Number, min: 1, max: 1.04 },
     nitratos: {
       type: Number,
       required: [true, "Los nitratos son obligatorios."],
@@ -36,20 +37,11 @@ const registroParametroSchema = new mongoose.Schema(
       trim: true,
       maxlength: [500, "Las notas no pueden superar 500 caracteres."],
     },
-    fechaRegistro: {
-      type: Date,
-      default: Date.now,
-      validate: {
-        validator: (value) => value <= new Date(),
-        message: "La fecha de registro no puede ser futura.",
-      },
-    },
+    fecha: { type: String, default: "" },
+    hora: { type: String, default: "" },
   },
   {
-    timestamps: {
-      createdAt: "creadoEn",
-      updatedAt: "actualizadoEn",
-    },
+    timestamps: true,
   },
 );
 

@@ -1,43 +1,19 @@
 import { isValidObjectId } from "mongoose";
 import RegistroParametro from "../models/registroParametro.model.js";
-import { obtenerEcosistemaPropioPorId } from "./ownership.service.js";
+import Ecosistema from "../models/ecosistema.model.js";
 
-const crearErrorHttp = (message, statusCode) => {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
+const errorHttp = (message, statusCode) => Object.assign(new Error(message), { statusCode });
+const comprobarEcosistema = async (id) => {
+  if (!isValidObjectId(id)) throw errorHttp("ID de ecosistema inválido", 400);
+  if (!await Ecosistema.exists({ _id: id })) throw errorHttp("Ecosistema no encontrado", 404);
 };
-
-export const obtenerRegistroParametrosPorEcosistemaService = async (
-  ecosistemaId,
-  usuarioIdAutenticado,
-) => {
-  if (!isValidObjectId(ecosistemaId)) {
-    throw crearErrorHttp("ID de ecosistema inválido", 400);
-  }
-  await obtenerEcosistemaPropioPorId(ecosistemaId, usuarioIdAutenticado);
-  return RegistroParametro.find({ ecosistemaId });
+export const obtenerRegistroParametrosPorEcosistemaService = async (ecosistemaId) => {
+  await comprobarEcosistema(ecosistemaId);
+  return RegistroParametro.find({ ecosistemaId }).sort({ createdAt: -1 });
 };
-
-export const crearRegistroParametroService = async (
-  registroParametroGuardar,
-  usuarioIdAutenticado,
-) => {
-  if (!isValidObjectId(registroParametroGuardar.ecosistemaId)) {
-    throw crearErrorHttp("ID de ecosistema inválido", 400);
-  }
-
-  await obtenerEcosistemaPropioPorId(
-    registroParametroGuardar.ecosistemaId,
-    usuarioIdAutenticado,
-  );
-
-  const registroParametro = new RegistroParametro(registroParametroGuardar);
-  await registroParametro.save();
-  return registroParametro;
+export const crearRegistroParametroService = async (datos) => {
+  await comprobarEcosistema(datos.ecosistemaId);
+  return RegistroParametro.create(datos);
 };
-
-
-export const obtenerRegistrosPorEcosistemaService =
-  obtenerRegistroParametrosPorEcosistemaService;
+export const obtenerRegistrosPorEcosistemaService = obtenerRegistroParametrosPorEcosistemaService;
 export const crearRegistroService = crearRegistroParametroService;

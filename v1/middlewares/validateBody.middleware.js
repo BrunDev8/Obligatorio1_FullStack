@@ -6,7 +6,7 @@ export const validateBodyMiddleware = (schema) => (req, res, next) => {
       field: Array.isArray(d.path) && d.path.length ? d.path.join('.') : '',
       message: d.message,
     }));
-    return res.status(400).json({ mensaje: "Error en validación", errors });
+    return res.status(400).json({ message: "Datos inválidos", errors });
   }
   req.validatedBody = value;
   next();

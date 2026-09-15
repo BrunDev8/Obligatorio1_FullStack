@@ -19,8 +19,8 @@ export const crearTareaSchema = Joi.object({
     "string.max": "La descripción no puede tener más de {#limit} caracteres",
   }).optional(),
 
-  tipo: Joi.string().trim().lowercase().valid("mantenimiento", "fertilizacion", "limpieza").required().messages({
-    "any.only": "El tipo de tarea debe ser: mantenimiento, fertilizacion o limpieza",
+  tipo: Joi.string().trim().lowercase().valid("mantenimiento", "fertilizacion", "limpieza", "cambio_agua", "dosificacion", "medicion").required().messages({
+    "any.only": "El tipo de tarea no es válido",
     "any.required": "El tipo de tarea es obligatorio",
   }),
 
@@ -29,17 +29,10 @@ export const crearTareaSchema = Joi.object({
     "any.required": "La frecuencia es obligatoria",
   }),
 
-  ultimaEjecucion: Joi.date().optional().allow(null).messages({
-    "date.base": "La fecha de la última ejecución debe ser una fecha válida",
-  }),
-
-  proximaEjecucion: Joi.date().optional().allow(null).messages({
-    "date.base": "La fecha de la próxima ejecución debe ser una fecha válida",
-  }),
-
-  completada: Joi.boolean().optional().messages({
-    "boolean.base": "El campo completada debe ser un booleano",
-  }),
+  fechaInicio: Joi.string().optional(),
+  hora: Joi.string().optional(),
+  aviso: Joi.string().optional(),
+  activa: Joi.boolean().optional(),
 });
 
 export const actualizarTareaSchema = Joi.object({

@@ -11,7 +11,7 @@ const tareaSchema = new mongoose.Schema(
     descripcion: { type: String, default: "" },
     tipo: {
       type: String,
-      enum: ["mantenimiento", "fertilizacion", "limpieza"],
+      enum: ["mantenimiento", "fertilizacion", "limpieza", "cambio_agua", "dosificacion", "medicion"],
       required: true,
     },
     frecuencia: {
@@ -19,11 +19,12 @@ const tareaSchema = new mongoose.Schema(
       enum: ["diaria", "semanal", "mensual"],
       required: true,
     },
-    ultimaEjecucion: { type: Date, default: null },
-    proximaEjecucion: { type: Date, default: null },
-    completada: { type: Boolean, default: false },
+    fechaInicio: { type: String, default: "" },
+    hora: { type: String, default: "" },
+    aviso: { type: String, default: "" },
+    activa: { type: Boolean, default: true },
   },
-  { timestamps: { createdAt: "creadoEn", updatedAt: "actualizadoEn" } },
+  { timestamps: true },
 );
 
 export default mongoose.model("Tarea", tareaSchema);

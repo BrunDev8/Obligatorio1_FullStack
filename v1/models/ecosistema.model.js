@@ -12,11 +12,6 @@ const ecosistemaSchema = new mongoose.Schema(
     tamano: {
       type: Number,
     },
-    usuarioId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Usuario",
-      required: true,
-    },
     categoriaId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Categoria",
@@ -24,7 +19,7 @@ const ecosistemaSchema = new mongoose.Schema(
     },
     imagenUrl: { type: String },
   },
-  { timestamps: { createdAt: "creadoEn", updatedAt: "actualizadoEn" } },
+  { timestamps: true },
 );
 
 export default mongoose.model("Ecosistema", ecosistemaSchema);

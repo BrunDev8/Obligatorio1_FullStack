@@ -1,61 +1,6 @@
-import {
-  obtenerRegistroParametrosPorEcosistemaService,
-  crearRegistroParametroService,
-} from "../services/registroParametro.services.js";
+import { obtenerRegistroParametrosPorEcosistemaService, crearRegistroParametroService } from "../services/registroParametro.services.js";
 
-export const obtenerRegistroParametrosPorEcosistema = async (req, res) => {
-  try {
-    const usuarioId = req.user?.id || req.decoded?.id;
-    const ecosistemaId = req.params.ecosistemaId;
-    const registroParametros =
-      await obtenerRegistroParametrosPorEcosistemaService(ecosistemaId, usuarioId);
-    if (Array.isArray(registroParametros) && registroParametros.length === 0) {
-      return res.json({ success: true, message: "No se encontraron registros de parámetros para el ecosistema", data: registroParametros });
-    }
-
-    res.json({ success: true, message: "Registros de parámetros obtenidos", data: registroParametros });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({
-      success: false,
-      message: "Error al obtener registros de parámetros",
-      error: err.message,
-    });
-  }
-};
-
-export const agregarRegistroParametro = async (req, res) => {
-  try {
-    const usuarioId = req.user?.id || req.decoded?.id;
-    const body = req.validatedBody || req.body;
-    const registroParametroGuardar = {
-      ecosistemaId: body.ecosistemaId,
-      temperatura: body.temperatura,
-      ph: body.ph,
-      humedad: body.humedad,
-      nitratos: body.nitratos,
-      notas: body.notas || "",
-      fechaRegistro: body.fechaRegistro
-        ? new Date(body.fechaRegistro)
-        : new Date(),
-    };
-    const registroParametro = await crearRegistroParametroService(
-      registroParametroGuardar,
-      usuarioId,
-    );
-    if (!registroParametro) {
-      return res.status(500).json({ success: false, message: "No se pudo crear el registro de parámetros" });
-    }
-
-    res.status(201).json({ success: true, message: "Registro de parámetros creado", data: registroParametro });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({
-      success: false,
-      message: "Error al crear registro de parámetros",
-      error: err.message,
-    });
-  }
-};
-
-export const obtenerRegistrosPorEcosistema =
-  obtenerRegistroParametrosPorEcosistema;
+export const obtenerRegistroParametrosPorEcosistema = async (req, res, next) => { try { return res.json({ data: await obtenerRegistroParametrosPorEcosistemaService(req.params.ecosistemaId) }); } catch (error) { next(error); } };
+export const agregarRegistroParametro = async (req, res, next) => { try { const body = req.validatedBody || req.body; const salinidad = body.salinidad ?? body.humedad; const data = await crearRegistroParametroService({ ...body, salinidad, humedad: body.humedad }); return res.status(201).json({ data }); } catch (error) { next(error); } };
+export const obtenerRegistrosPorEcosistema = obtenerRegistroParametrosPorEcosistema;
 export const agregarRegistro = agregarRegistroParametro;
